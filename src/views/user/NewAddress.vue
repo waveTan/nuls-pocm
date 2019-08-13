@@ -11,10 +11,12 @@
 
       <el-form :model="newAddressForm" status-icon :rules="newAddressRules" ref="newAddressForm" class="pass-form w630">
         <el-form-item label="密码" prop="pass">
-          <el-input type="password" v-model="newAddressForm.pass" autocomplete="off"></el-input>
+          <el-input type="password" v-model="newAddressForm.pass" autocomplete="off">
+          </el-input>
         </el-form-item>
         <el-form-item label="确认密码" prop="checkPass">
-          <el-input type="password" v-model="newAddressForm.checkPass" autocomplete="off"></el-input>
+          <el-input type="password" v-model="newAddressForm.checkPass" autocomplete="off">
+          </el-input>
         </el-form-item>
         <el-form-item class="form-bnt">
           <el-button type="success" @click="submitForm('newAddressForm')">创建账户</el-button>
@@ -71,36 +73,21 @@
     methods: {
 
       /**
-       *  创建账户提交
+       * 创建账户提交
        * @param formName
        **/
       async submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log(API_CHAIN_ID);
-            console.log(API_PREFIX);
-            console.log(this.newAddressForm.pass);
             this.newAddressInfo = nuls.newAddress(API_CHAIN_ID, this.newAddressForm.pass,API_PREFIX);
-            console.log(this.newAddressInfo);
-            this.getAddressInfoByAddress(this.newAddressInfo.address);
+            localStorage.setItem('accountInfo', JSON.stringify(this.newAddressInfo));
+            this.$router.push({
+              name: 'backupsAddress'
+            });
           } else {
             return false;
           }
         });
-      },
-
-      //获取账户信息根据创建的地址
-      async getAddressInfoByAddress(address) {
-        let addressInfo = await getAddressInfoByAddress(address);
-        let newAdressInfo = {...this.newAddressInfo, ...addressInfo.data};
-        if (addressInfo.success) {
-          localStorage.setItem('accountInfo', JSON.stringify(newAdressInfo));
-          this.$router.push({
-            name: 'backupsAddress'
-          });
-        } else {
-          this.$message({message: "创建地址错误: " + addressInfo.data.error.message, type: 'error', duration: 2000});
-        }
       },
 
       /**

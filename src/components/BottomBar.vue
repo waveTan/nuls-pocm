@@ -33,7 +33,9 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-    border-top: @BD1;
+    background-color: #FFFFFF;
+    border-top: 2px solid  #4ef16a;
+    //border-bottom-color: linear-gradient(to right, #4ef16a, #0ede94);
     .w1200{
       height: 100%;
       line-height: 60px;
