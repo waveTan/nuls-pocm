@@ -6,31 +6,31 @@
     </div>
     <div class="cb"></div>
     <div class=" w1200 projects_info bg-white">
-      <div class="p_list fl">
+      <div class="p_list shadow fl" @click="toUrl('projectsInfo')">
         <img src="./../../assets/img/list_bg.png"/>
         <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
         <p><span>当前运行节点</span><font class="fr">2</font></p>
         <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
       </div>
-      <div class="p_list fl">
+      <div class="p_list shadow fl">
         <img src="./../../assets/img/list_bg.png"/>
         <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
         <p><span>当前运行节点</span><font class="fr">2</font></p>
         <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
       </div>
-      <div class="p_list fl">
+      <div class="p_list shadow fl">
         <img src="./../../assets/img/list_bg.png"/>
         <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
         <p><span>当前运行节点</span><font class="fr">2</font></p>
         <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
       </div>
-      <div class="p_list fl">
+      <div class="p_list shadow fl">
         <img src="./../../assets/img/list_bg.png"/>
         <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
         <p><span>当前运行节点</span><font class="fr">2</font></p>
         <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
       </div>
-      <div class="p_list fl">
+      <div class="p_list shadow fl">
         <img src="./../../assets/img/list_bg.png"/>
         <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
         <p><span>当前运行节点</span><font class="fr">2</font></p>
@@ -42,7 +42,23 @@
 
 <script>
   export default {
-    name: "projects-list"
+    data() {
+      return {};
+    },
+    created() {
+    },
+    methods: {
+
+      /**
+       * url 连接
+       * @param name
+       */
+      toUrl(name) {
+        this.$router.push({
+          name: name,
+        })
+      }
+    }
   }
 </script>
 

@@ -15,10 +15,10 @@
             </div>
             <div class="user_info" v-else>
               <el-submenu index="user">
-                <template slot="title"><i class="el-icon-s-custom click " @click="toUrl('backupsAddress')"></i>&nbsp;
+                <template slot="title"><i class="el-icon-s-custom click "></i>&nbsp;
                 </template>
-                <el-menu-item index="signOut">退出</el-menu-item>
                 <el-menu-item index="userInfo">用户中心</el-menu-item>
+                <el-menu-item index="signOut">退出</el-menu-item>
               </el-submenu>
             </div>
           </div>
@@ -60,7 +60,9 @@
           this.toUrl('projectsList')
         }else if(key === 'token'){
           this.toUrl('newToken')
-        }else if (key === 'signOut') {
+        }else if (key === 'userInfo') {
+          this.toUrl('user')
+        }else if(key === 'signOut') {
           this.signOut();
         }
       },
@@ -89,7 +91,6 @@
 
 <style lang="less">
   @import "./../assets/css/style";
-
   .header {
     border-bottom: 2px solid  #4ef16a;
     //border-bottom-color: linear-gradient(to right, #4ef16a, #0ede94);

@@ -1,7 +1,7 @@
 <template>
   <div class="new-address bg-gray">
     <div class="bg-white">
-      <h3 class="title">欢迎来到NULS,我们一起让区块链世界变得更简单</h3>
+      <h3 class="title tc">欢迎来到NULS,我们一起让区块链世界变得更简单</h3>
     </div>
     <div class="tab bg-white w1200 mt_30">
       <div class="tips bg-gray w630">
@@ -108,6 +108,9 @@
 
   .new-address {
     .bg-white {
+      .title{
+        margin: 20px auto 0;
+      }
     }
     .tab {
       .tips {

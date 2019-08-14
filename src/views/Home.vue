@@ -31,7 +31,7 @@
         <el-col :span="12">
           <h4 class="title">我是项目发起者</h4>
           <p class="info">可以通过POCM的形式寻找持有NULS的项目合伙人，你可以将合伙人抵押的NULS用来去创建共识节点，以获取NULS奖励来支持项目的发展</p>
-          <el-button class="btn" round>提交申请信息</el-button>
+          <el-button class="btn" round @click="toUrl('projectsLaunch')">提交申请信息</el-button>
         </el-col>
       </div>
     </el-row>
@@ -41,25 +41,25 @@
         <h6></h6>
       </div>
       <div class="hot_list w1200">
-        <div class="p_list fl">
+        <div class="p_list shadow fl">
           <img src="./../assets/img/list_bg.png"/>
           <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
           <p><span>当前运行节点</span><font class="fr">2</font></p>
           <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
         </div>
-        <div class="p_list fl">
+        <div class="p_list shadow fl">
           <img src="./../assets/img/list_bg.png"/>
           <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
           <p><span>当前运行节点</span><font class="fr">2</font></p>
           <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
         </div>
-        <div class="p_list fl">
+        <div class="p_list shadow fl">
           <img src="./../assets/img/list_bg.png"/>
           <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
           <p><span>当前运行节点</span><font class="fr">2</font></p>
           <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
         </div>
-        <div class="p_list fl">
+        <div class="p_list shadow fl">
           <img src="./../assets/img/list_bg.png"/>
           <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
           <p><span>当前运行节点</span><font class="fr">2</font></p>
@@ -77,7 +77,17 @@
     },
     created() {
     },
-    methods: {}
+    methods: {
+      /**
+       * url 连接
+       * @param name
+       */
+      toUrl(name) {
+        this.$router.push({
+          name: name,
+        })
+      }
+    }
   }
 </script>
 

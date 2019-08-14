@@ -1,7 +1,7 @@
 <template>
   <div class="backups-address bg-gray">
     <div class="bg-white">
-      <h3 class="title">备份</h3>
+      <h3 class="title tc">备份</h3>
     </div>
     <div class="tab bg-white w1200 mt_30">
       <div class="address w630">
@@ -104,6 +104,9 @@
 
   .backups-address {
     .bg-white {
+      .title{
+        margin: 20px auto 0;
+      }
     }
     .tab {
       .address {
