@@ -18,6 +18,7 @@
                 <template slot="title"><i class="el-icon-s-custom click "></i>&nbsp;
                 </template>
                 <el-menu-item index="userInfo">用户中心</el-menu-item>
+                <el-menu-item index="code">唯一识别码</el-menu-item>
                 <el-menu-item index="signOut">退出</el-menu-item>
               </el-submenu>
             </div>
@@ -64,6 +65,8 @@
           this.toUrl('user')
         }else if(key === 'signOut') {
           this.signOut();
+        }else if(key === 'code') {
+          this.toUrl('codeToken')
         }
       },
 
