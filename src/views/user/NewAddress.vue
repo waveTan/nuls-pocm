@@ -59,6 +59,7 @@
           pass: '',
           checkPass: '',
         },
+
         newAddressRules: {
           pass: [
             {validator: validatePass, trigger: 'blur'}
@@ -80,14 +81,28 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.newAddressInfo = nuls.newAddress(API_CHAIN_ID, this.newAddressForm.pass,API_PREFIX);
-            localStorage.setItem('accountInfo', JSON.stringify(this.newAddressInfo));
-            this.$router.push({
-              name: 'backupsAddress'
-            });
+            this.addressInfoByAddress(this.newAddressInfo.address);
           } else {
             return false;
           }
         });
+      },
+
+      /**
+       * 获取账户信息根据创建的地址
+       * @param address
+       **/
+      async addressInfoByAddress(address) {
+        let addressInfo = await getAddressInfoByAddress(address);
+        let newAdressInfo = {...this.newAddressInfo, ...addressInfo.data};
+        if (addressInfo.success) {
+          localStorage.setItem('accountInfo', JSON.stringify(newAdressInfo));
+          this.$router.push({
+            name: 'backupsAddress'
+          });
+        } else {
+          this.$message({message: "创建地址获取地址信息错误: " + addressInfo.data.error.message, type: 'error', duration: 2000});
+        }
       },
 
       /**

@@ -77,6 +77,7 @@
         localStorage.removeItem('accountInfo');
         this.accountInfo = {};
         this.accountAddress = '';
+        this.toUrl('newAddress')
       },
 
       /**

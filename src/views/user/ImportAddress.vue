@@ -83,18 +83,27 @@
       BackBar
     },
     methods: {
+
+      /**
+       * 导入地址提交
+       * @param formName
+       **/
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.importAddressInfo = nuls.importByKey(API_CHAIN_ID, this.importForm.keys, this.importForm.pass);
-            this.getAddressInfoByAddress(this.importAddressInfo.address);
+            this.addressInfoByAddress(this.importAddressInfo.address);
           } else {
             return false;
           }
         });
       },
-      //获取账户信息根据创建的地址
-      async getAddressInfoByAddress(address) {
+
+      /**
+       * 获取账户信息根据创建的地址
+       * @param address
+       **/
+      async addressInfoByAddress(address) {
         let addressInfo = await getAddressInfoByAddress(address);
         let newAdressInfo = {...this.importAddressInfo, ...addressInfo.data};
         if (addressInfo.success) {
@@ -106,6 +115,7 @@
           this.$message({message: "导入地址错误: " + addressInfo.data.error.message, type: 'error', duration: 2000});
         }
       },
+
       /**
        * 连接跳转
        * @param name

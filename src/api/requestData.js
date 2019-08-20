@@ -128,15 +128,14 @@ export async function getAddressInfoByAddress(address) {
 
 /**
  * 获取地址的余额及nonce根据地址
- * @param assetChainId
- * @param assetId
- * @param address
+ * @param  address
+ * @param  assetId
  * @returns {Promise<any>}
  */
-export async function getBalanceOrNonceByAddress(address, assetId = 1) {
-  return await post('/', 'getAccountBalance', [assetId, address])
+export async function getBalanceOrNonceByAddress(chainId, assetId, address) {
+  return await post('/', 'getAccountBalance', [chainId, assetId, address])
     .then((response) => {
-      console.log(response);
+      //console.log(response);
       if (response.hasOwnProperty("result")) {
         return {success: true, data: {balance: response.result.balance, nonce: response.result.nonce}}
       } else {
