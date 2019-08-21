@@ -43,7 +43,7 @@
         <div class="div_info cb">
           <h3 class="title">Token分配</h3>
           <div>
-            图标工具
+            <ve-ring :data="chartData" :settings="chartSettings"></ve-ring>
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@
         <div class="entrust shadow">
           <h3>预计挖矿结束时间: 2019-08-11 15:08:18</h3>
           <el-form :model="entrustForm" status-icon :rules="entrustRules" ref="entrustForm" class="entrust_form">
-            <div class="tr font12 balance">余额: 999.0025 <span class="fCN">NULS</span></div>
+            <div class="tr font12 balance">余额: {{accountInfo.balance/100000000}} <span class="fCN">NULS</span></div>
             <el-form-item label="" prop="number">
               <el-input v-model.number="entrustForm.number" placeholder="请输入委托NULS数量"></el-input>
             </el-form-item>
@@ -82,10 +82,33 @@
           }
         }, 1000);
       };
+
+      this.chartSettings = {
+        dimension: 'allocation',
+        metrics: 'percent'
+      };
       return {
 
+        accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
         releaseId: this.$route.query.releaseId,//合约地址
         projectsInfo:{},//项目信息
+
+        chartData: {
+          columns: ['allocation', 'percent'],
+          rows: [
+            { allocation: '基金会', percent: 10 },
+            { allocation: '战略合作', percent: 20 },
+            { allocation: '游戏合作', percent: 50 },
+            { allocation: '团队', percent: 20 },
+          ]
+        },
+
+        tokenAllocationList:[
+          {allocation: "基金会", percent: "10.00"},
+          {allocation: "战略合作", percent: "20.00"},
+          {allocation: "游戏合作", percent: "50.00"},
+          {allocation: "团队", percent: "20.00"},
+        ],
 
         entrustForm: {
           number: ''
