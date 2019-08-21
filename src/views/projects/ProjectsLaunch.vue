@@ -16,11 +16,11 @@
             <el-input v-model="launchForm.tokenTotalSupply" placeholder="请填写总发行量">
             </el-input>
           </el-form-item>
-          <el-form-item label="流通比例" prop="tokenInitialCirculatingPercent">
+          <el-form-item label="流通比例%" prop="tokenInitialCirculatingPercent">
             <el-input v-model="launchForm.tokenInitialCirculatingPercent" placeholder="请填写初始流通比例">
             </el-input>
           </el-form-item>
-          <el-form-item label="发行比例" prop="tokenMiningPercent">
+          <el-form-item label="发行比例%" prop="tokenMiningPercent">
             <el-input v-model="launchForm.tokenMiningPercent" placeholder="请填写通过POCM发行比例">
             </el-input>
           </el-form-item>
@@ -41,11 +41,13 @@
             </el-input>
           </el-form-item>
           <el-form-item label="项目说明" prop="introduction">
-            <el-input type="textarea" v-model="launchForm.introduction" placeholder="请填写项目说明">
+            <el-input type="textarea" maxlength="200" show-word-limit v-model="launchForm.introduction"
+                      placeholder="请填写项目说明">
             </el-input>
           </el-form-item>
           <el-form-item label="主要功能" prop="mainFunctionPoints">
-            <el-input type="textarea" v-model="launchForm.mainFunctionPoints" placeholder="请填写项目主要功能点">
+            <el-input type="textarea" maxlength="200" show-word-limit v-model="launchForm.mainFunctionPoints"
+                      placeholder="请填写项目主要功能点">
             </el-input>
           </el-form-item>
           <div class="channel_proportion">
@@ -70,68 +72,101 @@
 
 <script>
   import axios from 'axios'
+  import {stringLength} from '@/api/util'
 
   export default {
     data() {
       let checkName = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请输入您的项目名称'));
+        } else if (2 > stringLength(value) || 16 < stringLength(value)) {
+          return callback(new Error('项目名称长度为2-16'));
         } else {
           callback();
         }
       };
       let checkEmail = (rule, value, callback) => {
+        let regular = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
         if (!value) {
           return callback(new Error('请输入您的电子邮件'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确的电子邮件'));
         } else {
           callback();
         }
       };
       let checkTokenTotalSupply = (rule, value, callback) => {
+        let regular = /^[1-9]\d*$/;
         if (!value) {
           return callback(new Error('请输入总发行量'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确总发行量'));
         } else {
           callback();
         }
       };
       let checkTokenInitialCirculatingPercent = (rule, value, callback) => {
+        let regular = /^(?:[1-9]?\d|100)$/;
         if (!value) {
           return callback(new Error('请输入初始流通比例'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确初始流通比例0-100整数'));
         } else {
           callback();
         }
       };
       let checkTokenMiningPercent = (rule, value, callback) => {
+        let regular = /^(?:[1-9]?\d|100)$/;
         if (!value) {
-          return callback(new Error('请输入通过POCM发行比例'));
+          return callback(new Error('请输入POCM发行比例'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确POCM发行比例0-100整数'));
         } else {
           callback();
         }
       };
       let checkTokenName = (rule, value, callback) => {
+        let regular = /[a-zA-Z]$/;
         if (!value) {
           return callback(new Error('请输入Token全名'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确Token全名只允许英文'));
+        } else if (2 > stringLength(value) || 16 < stringLength(value)) {
+          return callback(new Error('请输入正确Token全名长度为2-16'));
         } else {
           callback();
         }
       };
       let checkTokenSymbol = (rule, value, callback) => {
+        let regular = /[a-zA-Z]$/;
         if (!value) {
           return callback(new Error('请输入Token缩写'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确Token缩写只允许英文'));
+        } else if (2 > stringLength(value) || 16 < stringLength(value)) {
+          return callback(new Error('请输入正确Token缩写长度为2-16'));
         } else {
           callback();
         }
       };
       let checkWebsite = (rule, value, callback) => {
+        let regular = /^((ht|f)tps?):\/\/([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/;
         if (!value) {
           return callback(new Error('请输入官网地址'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确的官网地址'));
         } else {
           callback();
         }
       };
       let checkProjectCard = (rule, value, callback) => {
+        let regular = /[a-zA-Z]$/;
         if (!value) {
           return callback(new Error('请输入项目介绍'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入正确项目介绍只允许英文'));
+        } else if (2 > stringLength(value) || 50 < stringLength(value)) {
+          return callback(new Error('请输入正确项目介绍长度为2-50'));
         } else {
           callback();
         }
@@ -139,6 +174,8 @@
       let checkIntroduction = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请输入项目说明'));
+        } else if (8 > stringLength(value) || 200 < stringLength(value)) {
+          return callback(new Error('请输入正确项目说明长度为8-200'));
         } else {
           callback();
         }
@@ -146,6 +183,8 @@
       let checkMainFunctionPoints = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请输入项目主要功能点'));
+        } else if (8 > stringLength(value) || 200 < stringLength(value)) {
+          return callback(new Error('请输入正确项目主要功能点长度为8-200'));
         } else {
           callback();
         }
@@ -166,7 +205,8 @@
           mainFunctionPoints: 'wave wave wave wave wave',
           tokenAllocationList: [{
             allocation: 'wave所有',
-            percent: '100'
+            percent: '100',
+            key: Date.now()
           }]
         },
         launchRules: {
@@ -184,6 +224,11 @@
         }
       };
     },
+    created() {
+      console.log(stringLength(this.launchForm.name));
+    },
+    mounted() {
+    },
     methods: {
 
       /**
@@ -191,7 +236,8 @@
        */
       addDomain() {
         this.launchForm.tokenAllocationList.push({
-          value: '',
+          allocation: '',
+          percent: '',
           key: Date.now()
         });
       },
@@ -214,18 +260,18 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            //console.log(this.launchForm);
-            this.launch(this.launchForm);
+            console.log(this.launchForm);
+            //this.launch(this.launchForm);
           } else {
             return false;
           }
         });
       },
 
-     /**
-      * 提交项目
-      * @param data
-      **/
+      /**
+       * 提交项目
+       * @param data
+       **/
       launch(data) {
         console.log(data);
         const url = 'http://192.168.1.39:8080/pocm/release';

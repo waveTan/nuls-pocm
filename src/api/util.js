@@ -160,6 +160,19 @@ export function getLocalTime(time) {
 }
 
 /**
+ * @disc: 获取utf-8中英文混合长度
+ * @params: string
+ * @date: 2019-08-21 15:35
+ * @author: Wave
+ * @returns Number
+ */
+export function stringLength(string) {
+  let enc = new TextEncoder("utf-8");
+   return enc.encode(string).length;
+}
+
+
+/**
  * 连接跳转
  * @param name
  * @param parameter {}

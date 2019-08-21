@@ -16,7 +16,7 @@
         <el-col :span="12">
           <h4 class="title">我是投资者</h4>
           <p class="info">如果你是投资者，你可以将持有的NULS抵押到你看好的项目，以获得对应项目的Token，且不会损失当前持有的NULS</p>
-          <el-button round class="btn">选择项目</el-button>
+          <el-button round class="btn" @click="toUrl('projectsList')">选择项目</el-button>
         </el-col>
         <el-col :span="12">
           <img src="./../assets/img/investor_bg.png" class="img_bg">
