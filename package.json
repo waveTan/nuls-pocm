@@ -12,6 +12,7 @@
     "copy-to-clipboard": "^3.1.0",
     "element-ui": "^2.4.5",
     "less": "^3.9.0",
+    "moment": "^2.24.0",
     "nuls-sdk-js": "^2.2.7",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",

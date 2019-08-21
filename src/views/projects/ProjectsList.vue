@@ -6,88 +6,96 @@
     </div>
     <div class="cb"></div>
     <div class=" w1200 projects_info bg-white">
-      <div class="p_list shadow fl" @click="toUrl('projectsInfo')">
+      <div class="p_list shadow fl" v-for="(item,index) in projectsList" :key="index"
+           @click="toUrl('projectsInfo',item.id)">
         <img src="./../../assets/img/list_bg.png"/>
-        <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
-        <p><span>当前运行节点</span><font class="fr">2</font></p>
-        <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
-      </div>
-      <div class="p_list shadow fl">
-        <img src="./../../assets/img/list_bg.png"/>
-        <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
-        <p><span>当前运行节点</span><font class="fr">2</font></p>
-        <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
-      </div>
-      <div class="p_list shadow fl">
-        <img src="./../../assets/img/list_bg.png"/>
-        <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
-        <p><span>当前运行节点</span><font class="fr">2</font></p>
-        <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
-      </div>
-      <div class="p_list shadow fl">
-        <img src="./../../assets/img/list_bg.png"/>
-        <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
-        <p><span>当前运行节点</span><font class="fr">2</font></p>
-        <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
-      </div>
-      <div class="p_list shadow fl">
-        <img src="./../../assets/img/list_bg.png"/>
-        <h6>Aleph 一个专注于Layer2 的平台XXXXXXAleph 一个专注于 一个专注于Layer2 的平注于Layer2 的注于Layer2 的台XXXXXX</h6>
-        <p><span>当前运行节点</span><font class="fr">2</font></p>
-        <p><span>抵押NULS总数</span><font class="fr">7,655,432</font></p>
+        <h2 class="font18">{{item.name}}</h2>
+        <h6>{{item.projectCard}}</h6>
+        <p><span>当前运行节点</span><font class="fr">{{item.agentsCount}}</font></p>
+        <p><span>抵押NULS总数</span><font class="fr">{{item.totalDeposit}}</font></p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
+
   export default {
     data() {
-      return {};
+      return {
+        projectsList: [],//项目列表
+      };
     },
     created() {
+      this.selectDataByStatus();
     },
     methods: {
 
       /**
-       * url 连接
-       * @param name
+       * @disc: 获取下拉框信息
+       * @params:
+       * @date: 2019-08-20 17:51
+       * @author: Wave
        */
-      toUrl(name) {
+      selectDataByStatus() {
+        const url = 'http://192.168.1.39:8080/pocm/release/list';
+        const data = {status: 0};
+        axios.post(url, data)
+          .then((response) => {
+            if (response.data.success) {
+              this.projectsList = [...response.data.data];
+              console.log(this.projectsList)
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      },
+
+      /**
+       * @disc: url 连接
+       * @params: name
+       * @params: params
+       * @date: 2019-08-20 18:01
+       * @author: Wave
+       */
+      toUrl(name,params) {
         this.$router.push({
           name: name,
-        })
+          query: {releaseId: params}
+        });
       }
     }
   }
 </script>
 
 <style lang="less">
-  .projects_list{
+  .projects_list {
     min-height: 900px;
     margin: 0 auto 60px;
-    .projects_title{
-      .info{
+    .projects_title {
+      .info {
         font-size: 22px;
         line-height: 50px;
         margin: 20px 0 0 0;
       }
-      .btn{
+      .btn {
         margin: 20px 0 0 0 !important;
       }
     }
-    .projects_info{
+    .projects_info {
       margin: 20px auto 0;
-      .p_list{
+      .p_list {
         margin: 50px 10px 0;
         width: 285px;
-        &:first-child{
+        &:first-child {
           margin-left: 0;
         }
-        &:nth-child(4n){
+        &:nth-child(4n) {
           margin-right: 0;
         }
-        &:nth-child(5n){
+        &:nth-child(5n) {
           margin-left: 0;
         }
       }

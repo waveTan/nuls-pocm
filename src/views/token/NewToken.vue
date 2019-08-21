@@ -8,7 +8,7 @@
               NRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXX
             </div>
             <el-form :model="nrc20Form" status-icon :rules="nrc20Rules" ref="nrc20Form" class="new_form w630">
-              <el-form-item label="合约名称" prop="contractName20">
+              <el-form-item label="合约名称" prop="contractName20" v-show="false">
                 <el-input v-model="nrc20Form.contractName20">
                 </el-input>
               </el-form-item>
@@ -44,6 +44,10 @@
               NRC-721 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXX
             </div>
             <el-form :model="nrc721Form" status-icon :rules="nrc721Rules" ref="nrc721Form" class="new_form w630">
+              <el-form-item label="合约名称" prop="contractName20" v-show="false">
+                <el-input v-model="nrc721Form.contractName721">
+                </el-input>
+              </el-form-item>
               <el-form-item label="通证名称" prop="name721">
                 <el-input v-model="nrc721Form.name721">
                 </el-input>
@@ -77,7 +81,7 @@
   import sdk from 'nuls-sdk-js/lib/api/sdk'
   import utils from 'nuls-sdk-js/lib/utils/utils'
   import Password from '@/components/PasswordBar'
-  import {API_CHAIN_ID, NRC20_HEX} from '@/config'
+  import {API_CHAIN_ID, NRC20_HEX, NRC_721} from '@/config'
   import {
     getBalanceOrNonceByAddress,
     countFee,
@@ -89,13 +93,6 @@
 
   export default {
     data() {
-      let checkContractName20 = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('合约名称不能为空!'));
-        } else {
-          callback();
-        }
-      };
       let checkName20 = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('通证名称不能为空!'));
@@ -145,14 +142,13 @@
         balanceInfo: {},//账户余额信息
         activeName: 'nrc20', //tab 默认选中
         nrc20Form: {
-          contractName20: 'wave000002',
-          name20: 'wave002',
-          symbol20: 'wave002',
+          contractName: 'nrc20',
+          name20: 'pocmnrc20',
+          symbol20: 'nrc20',
           circulation: 9999999,
           accuracy: 9,
         },
         nrc20Rules: {
-          contractName20: [{validator: checkContractName20, trigger: 'blur'}],
           name20: [{validator: checkName20, trigger: 'blur'}],
           symbol20: [{validator: checkSymbol20, trigger: 'blur'}],
           circulation: [{validator: checkCirculation, trigger: 'blur'}],
@@ -164,8 +160,9 @@
         contractCreateTxData: {},//组装创建合约交易
 
         nrc721Form: {
-          name721: '',
-          symbol721: '',
+          contractName: 'nrc721',
+          name721: 'pocmnrc721',
+          symbol721: 'nrc721',
         },
         nrc721Rules: {
           name721: [{validator: checkName721, trigger: 'blur'}],
@@ -199,8 +196,8 @@
           if (valid) {
             let newArr = Object.values(this.nrc20Form);
             newArr.shift();
-            this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC20_HEX, newArr);
-            this.$refs.password.showPassword(true)
+            this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC20_HEX, newArr, this.nrc20Form);
+            this.$refs.password.showPassword(true);
           } else {
             return false;
           }
@@ -214,9 +211,11 @@
       submitNrc721Form(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!');
+            let newArr = Object.values(this.nrc721Form);
+            newArr.shift();
+            this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC_721, newArr, this.nrc721Form);
+            this.$refs.password.showPassword(true);
           } else {
-            console.log('error submit!!');
             return false;
           }
         });
@@ -241,6 +240,7 @@
           let pub = this.accountInfo.pub;
           let remark = '';
           let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+          console.log(inOrOutputs);
           if (!inOrOutputs.success) {
             this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
           }
@@ -259,11 +259,12 @@
             txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
           }
           console.log(transferInfo);
-          console.log(txhex);
+          //console.log(txhex);
           await validateAndBroadcast(txhex).then((response) => {
             console.log(response);
             if (response.success) {
               this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 1000});
+              this.contractCreateTxData = {};
             } else {
               this.$message({message: "合约验证并广播失败", type: 'error', duration: 1000});
             }
@@ -284,12 +285,12 @@
        * @param contractCode
        * @param args
        */
-      async validateContractCreate(createAddress, gasLimit, price, contractCode, args) {
+      async validateContractCreate(createAddress, gasLimit, price, contractCode, args, formData) {
         return await this.$post('/', 'validateContractCreate', [createAddress, gasLimit, price, contractCode, args])
           .then((response) => {
             console.log(response);
             if (response.result.success) {
-              this.imputedContractCreateGas(createAddress, contractCode, args);
+              this.imputedContractCreateGas(createAddress, contractCode, args, formData);
             } else {
               this.$message({message: "验证创建合约交易错误", type: 'error', duration: 1000});
             }
@@ -306,13 +307,13 @@
        * @param contractCode
        * @param args
        */
-      async imputedContractCreateGas(createAddress, contractCode, args) {
+      async imputedContractCreateGas(createAddress, contractCode, args, formData) {
         return await this.$post('/', 'imputedContractCreateGas', [createAddress, contractCode, args])
           .then((response) => {
             console.log(response);
             if (response.hasOwnProperty("result")) {
               this.gas = response.result.gasLimit;
-              this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, this.nrc20Form.contractName20);
+              this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, formData.contractName, formData);
             } else {
               this.$message({message: "预估创建合约交易的gas错误", type: 'error', duration: 1000});
             }
@@ -331,7 +332,7 @@
        * @param args
        * @param alias
        */
-      async makeCreateData(gasLimit, createAddress, contractCode, args, alias) {
+      async makeCreateData(gasLimit, createAddress, contractCode, args, alias, formData) {
         let contractCreate = {};
         contractCreate.chainId = API_CHAIN_ID;
         contractCreate.sender = createAddress;
@@ -339,8 +340,9 @@
         contractCreate.price = sdk.CONTRACT_MINIMUM_PRICE;
         contractCreate.contractCode = contractCode;
         contractCreate.alias = alias;
-        delete this.nrc20Form.contractName20;
-        let contractConstructorArgsTypes = this.makeContractConstructorArgsTypes(this.nrc20Form);
+        let newFormData = formData;
+        delete newFormData.contractName;
+        let contractConstructorArgsTypes = this.makeContractConstructorArgsTypes(newFormData);
         if (args.length !== 0) {
           contractCreate.args = await utils.twoDimensionalArray(args, contractConstructorArgsTypes);
         } else {
@@ -386,6 +388,7 @@
             this.$message({message: "获取账户余额错误", type: 'error', duration: 1000});
           }
         }).catch((error) => {
+          console.log(error);
           this.$message({message: "获取账户余额异常", type: 'error', duration: 1000});
         });
       },

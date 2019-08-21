@@ -140,6 +140,26 @@ export function superLong(string, leng) {
 }
 
 /**
+ * 根据不同时区显示时间
+ * @param time
+ * @returns {*}
+ */
+export function getLocalTime(time) {
+  if (typeof time !== 'number') return;
+  let d = new Date();
+  let offset = d.getTimezoneOffset() * 60000;
+  let localUtc = new Date().getTimezoneOffset() / 60;
+  let utcTime;
+  if (localUtc > 0) {
+    utcTime = time - offset;
+  } else {
+    utcTime = time + offset;
+  }
+  let localTime = utcTime + 3600000 * Math.abs(localUtc);
+  return new Date(localTime);
+}
+
+/**
  * 连接跳转
  * @param name
  * @param parameter {}

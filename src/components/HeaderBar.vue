@@ -56,7 +56,8 @@
        * @param keyPath
        */
       handleSelect(key, keyPath) {
-        console.log(key, keyPath);
+        console.log(key);
+        //console.log(key, keyPath);
         if(key === 'projects'){
           this.toUrl('projectsList')
         }else if(key === 'token'){

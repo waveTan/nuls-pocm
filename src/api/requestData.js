@@ -1,5 +1,7 @@
+import nuls from 'nuls-sdk-js'
 import {post} from './https'
-import {Plus, chainID} from './util'
+import {Plus, Minus} from './util'
+import {API_CHAIN_ID, API_PREFIX, API_BURNING_ADDRESS_PUB} from './../config'
 
 /**
  * 计算手续费
@@ -68,17 +70,17 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
     nonce: newNonce
   }];
 
-  if (type === 2 && transferInfo.assetsChainId !== chainID()) {
+  if (type === 2 && transferInfo.assetsChainId !== API_CHAIN_ID) {
     inputs[0].amount = transferInfo.amount;
     //账户转出资产余额
-    let nulsbalance = await getBalanceOrNonceByAddress(chainID(), transferInfo.assetsId, transferInfo.fromAddress);
+    let nulsbalance = await getBalanceOrNonceByAddress(API_CHAIN_ID, transferInfo.assetsId, transferInfo.fromAddress);
     if (nulsbalance.data.balance < 100000) {
       console.log("余额小于手续费");
       return
     }
     inputs.push({
       address: transferInfo.fromAddress,
-      assetsChainId: chainID(),
+      assetsChainId: API_CHAIN_ID,
       assetsId: transferInfo.assetsId,
       amount: 100000,
       locked: newLocked,
@@ -86,7 +88,16 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
     })
   }
   let outputs = [];
-  if (type === 15 || type === 17) {
+  if (type === 15) {
+    //TODO 10个nuls 手续费
+   /* inputs[0].amount = 10 * 100000000;
+    outputs = [{
+      address: nuls.getAddressByPub(API_CHAIN_ID, 1, API_BURNING_ADDRESS_PUB, API_PREFIX),
+      assetsChainId: API_CHAIN_ID,
+      assetsId: 1,
+      amount: Number(Minus(inputs[0].amount, newAmount)),
+      lockTime: newLockTime
+    }];*/
     return {success: true, data: {inputs: inputs, outputs: outputs}};
   }
   if (type === 16) {
@@ -96,6 +107,10 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
       newoutputAmount = transferInfo.value;
     }
   }
+  if (type === 17) {
+    return {success: true, data: {inputs: inputs, outputs: outputs}};
+  }
+
   outputs = [{
     address: transferInfo.toAddress ? transferInfo.toAddress : transferInfo.fromAddress,
     assetsChainId: transferInfo.assetsChainId,
