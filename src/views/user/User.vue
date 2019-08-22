@@ -39,7 +39,7 @@
         </el-tab-pane>
         <el-tab-pane label="我的通证" name="myPassport">
           <el-table :data="passportList" :stripe="true" class="tables">
-            <el-table-column prop="type" label="通证类型" width="150">
+            <el-table-column prop="tokenType" label="通证类型" width="150">
             </el-table-column>
             <el-table-column prop="createTime" label="创建时间" width="180">
             </el-table-column>
@@ -64,7 +64,7 @@
 <script>
   import axios from 'axios'
   import moment from 'moment'
-  import {timesDecimals, getLocalTime} from '@/api/util'
+  import {divisionDecimals, getLocalTime} from '@/api/util'
   import {getAddressInfoByAddress} from '@/api/requestData'
   import {POCM_API_URL} from '@/config'
 
@@ -72,7 +72,7 @@
     data() {
       return {
         accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
-        activeName: 'myPassport',
+        activeName: 'myProject',
 
         selectOptions: [],
         selectValue: '',
@@ -97,8 +97,10 @@
        * @date: 2019-08-20 16:57
        * @author: Wave
        */
-      handleClick(tab, event) {
-        console.log(tab, event);
+      handleClick(tab) {
+        if (tab.name === 'myPassport') {
+          this.getMyTokenListByAddress(this.accountInfo.address);
+        }
       },
 
       /**
@@ -114,11 +116,7 @@
             //console.log(response);
             if (response.success) {
               this.accountInfo = {};
-              for (let item of response.result.list) {
-                item.createTime = moment(getLocalTime(item.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');
-              }
-              this.passportList = [...response.result.list];
-              response.data.balance = timesDecimals(response.data.balance);
+              response.data.balance = divisionDecimals(response.data.balance);
               this.accountInfo = {...newData, ...response.data};
             } else {
               this.accountInfo.balance = 0
@@ -140,6 +138,7 @@
         const data = {status: 0};
         axios.post(url, data)
           .then((response) => {
+            //console.log(response);
             if (response.data.success) {
               this.selectOptions = [...response.data.data];
               this.selectValue = response.data.data[0].id;
@@ -162,13 +161,40 @@
         const data = {releaseId: Id};
         axios.post(url, data)
           .then((response) => {
+            //console.log(response);
             if (response.data.success) {
-              this.projectList = [...response.data.data];
+              if (response.data.data) {
+                this.projectList = [...response.data.data];
+              }
             }
           })
           .catch((error) => {
             console.log(error)
           })
+      },
+
+      /**
+       * @disc: 获取我的通证列表
+       * @params: address
+       * @date: 2019-08-22 14:07
+       * @author: Wave
+       */
+      async getMyTokenListByAddress(address) {
+        await this.$post('/', 'getAccountContractList', [this.pageIndex, this.pageSize, address, -1, false])
+          .then((response) => {
+            console.log(response);
+            if (response.hasOwnProperty("result")) {
+              for (let item of response.result.list) {
+                item.createTime = moment(getLocalTime(item.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');
+              }
+              this.passportList = [...response.result.list];
+            } else {
+              this.$message({message: "获取我的通证列表错误：" + JSON.stringify(response.error), type: 'error', duration: 3000});
+            }
+          })
+          .catch((error) => {
+            this.$message({message: "获取我的通证列表异常：" + JSON.stringify(error), type: 'error', duration: 3000});
+          });
       },
 
     },

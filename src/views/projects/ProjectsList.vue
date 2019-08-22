@@ -41,14 +41,11 @@
        */
       selectDataByStatus() {
         const url = POCM_API_URL +'/pocm/release/list';
-        //const url = 'http://192.168.1.39:8080/pocm/release/list';
-        console.log(url);
-        const data = {status: 0};
+        const data = {status: 1};
         axios.post(url, data)
           .then((response) => {
             if (response.data.success) {
               this.projectsList = [...response.data.data];
-              console.log(this.projectsList)
             }
           })
           .catch((error) => {

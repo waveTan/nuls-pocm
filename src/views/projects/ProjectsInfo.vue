@@ -8,7 +8,7 @@
           <h4 class="fCN">{{projectsInfo.name}}</h4>
           <p>{{projectsInfo.projectCard}}</p>
           <h5>
-            <span class="clicks"><i class="el-icon-s-help"></i> 官网</span>
+            <span class="clicks" @click="toUrl(projectsInfo.website,'',1)"><i class="el-icon-s-help"></i> 官网</span>
             <!--<span class="clicks"><i class="el-icon-receiving"></i> Github</span>-->
           </h5>
         </div>
@@ -76,7 +76,7 @@
   import nuls from 'nuls-sdk-js'
   import {POCM_API_URL, API_CHAIN_ID, API_PREFIX} from '@/config'
   import Password from '@/components/PasswordBar'
-  import {timesDecimals, Times, Plus, validateContractCall} from '@/api/util'
+  import {timesDecimals, Times, Plus, validateContractCall, connect} from '@/api/util'
   import {inputsOrOutputs, countFee, validateAndBroadcast, passwordVerification} from '@/api/requestData'
 
   export default {
@@ -139,7 +139,7 @@
         const url = POCM_API_URL + '/pocm/release/' + releaseId;
         axios.get(url)
           .then((response) => {
-            //console.log(response.data);
+            console.log(response.data);
             if (response.data.success) {
               this.projectsInfo = response.data.data;
             }
@@ -245,7 +245,17 @@
         } else {
           this.$message({message: this.$t('address.address13'), type: 'error', duration: 1000});
         }
-      }
+      },
+
+      /**
+       * @disc: url 连接
+       * @params: name, parameter, type
+       * @date: 2019-08-22 14:26
+       * @author: Wave
+       */
+      toUrl(name, parameter, type) {
+        connect(name, parameter, type)
+      },
     }
   }
 </script>

@@ -224,7 +224,6 @@ export function connect(name, parameter, type = 0) {
       query: parameter
     });
   } else {
-    //shell.openExternal(newUrl);
     window.open(name, '_blank');
   }
 
