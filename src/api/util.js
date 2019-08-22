@@ -1,6 +1,7 @@
 import {BigNumber} from 'bignumber.js'
-import copy from 'copy-to-clipboard'
-import {API_CHAIN_ID} from './../config'
+import utils from 'nuls-sdk-js/lib/utils/utils'
+import nuls from 'nuls-sdk-js'
+import {API_CHAIN_ID, API_PREFIX} from '@/config'
 
 /**
  * 10的N 次方
@@ -62,80 +63,35 @@ export function Division(nu, arg) {
 }
 
 /**
- * 复制 copy
- * @param value
- */
-export const copys = (value) => copy(value);
-
-/**
  * 数字除以精度系数
  */
-export function timesDecimals(nu, decimals = 8) {
+export function divisionDecimals(nu, decimals = 8) {
   let newNu = new BigNumber(Division(nu, Power(decimals)).toString());
   return newNu.toFormat().replace(/[,]/g, '');
 }
 
 /**
- * 获取链ID
- * @returns {number}
+ * 数字乘以精度系数
  */
-export function chainID() {
-  return API_CHAIN_ID
+export function timesDecimals(nu, decimals = 8) {
+  let newNu = new BigNumber(Times(nu, Power(decimals)).toString());
+  return Number(newNu);
 }
 
 /**
- * 获取chainId+number
- * @returns {string}
+ * @disc: 验证密码
+ * @params:  accountInfo
+ * @params:  password
+ * @date: 2019-08-22 12:05
+ * @author: Wave
  */
-export function chainIdNumber() {
-  return 'chainId' + chainID();
-}
-
-/**
- * 获取地址列表或选择地址
- * @param type 0:地址列表，1:选中地址
- * @returns {*}
- */
-export function addressInfo(type) {
-  let chainNumber = 'chainId' + chainID();
-  let addressList = localStorage.hasOwnProperty(chainNumber) ? JSON.parse(localStorage.getItem(chainNumber)) : [];
-  if (addressList) {
-    if (type === 0) {
-      return addressList
-    } else {
-      for (let item  of addressList) {
-        if (item.selection) {
-          return item
-        }
-      }
-    }
+export function passwordVerification(accountInfo, password) {
+  const pri = nuls.decrypteOfAES(accountInfo.aesPri, password);
+  const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password, API_PREFIX);
+  if (newAddressInfo.address === accountInfo.address) {
+    return {success: true};
   } else {
-    return addressList
-  }
-}
-
-/**
- * 超长数字显示
- * @param nu
- * @param powerNu
- * @returns {string}
- */
-export function langNumber(nu, powerNu) {
-  let newNu = new BigNumber(Division(nu, powerNu).toString());
-  return newNu.toFormat().replace(/[,]/g, '');
-}
-
-/**
- * 字符串中间显示....
- * @param string
- * @param leng
- * @returns {*}
- */
-export function superLong(string, leng) {
-  if (string && string.length > 10) {
-    return string.substr(0, leng) + "...." + string.substr(string.length - leng, string.length);
-  } else {
-    return string;
+    return {success: false};
   }
 }
 
@@ -168,14 +124,97 @@ export function getLocalTime(time) {
  */
 export function stringLength(string) {
   let enc = new TextEncoder("utf-8");
-   return enc.encode(string).length;
+  return enc.encode(string).length;
 }
 
+/**
+ * 验证调用合约交易
+ * @param sender
+ * @param value
+ * @param gasLimit
+ * @param price
+ * @param contractAddress
+ * @param methodName
+ * @param methodDesc
+ * @param args
+ */
+export async function validateContractCall(sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args) {
+  return await this.$post('/', 'validateContractCall', [sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args])
+    .then((response) => {
+      //console.log(response);
+      if (response.result.success) {
+        this.imputedContractCallGas(sender, value, contractAddress, methodName, methodDesc, args)
+      } else {
+        return {success: false, msg: response.result.msg, code: 1000};
+      }
+    })
+    .catch((error) => {
+      return {success: false, msg: error, code: 10000};
+    });
+}
+
+/**
+ * 预估调用合约交易的gas
+ * @param sender
+ * @param value
+ * @param contractAddress
+ * @param methodName
+ * @param methodDesc
+ * @param args
+ */
+export async function imputedContractCallGas(sender, value, contractAddress, methodName, methodDesc, args) {
+  return await this.$post('/', 'imputedContractCallGas', [sender, value, contractAddress, methodName, methodDesc, args])
+    .then((response) => {
+      //console.log(response.result);
+      if (response.hasOwnProperty("result")) {
+        let contractConstructorArgsTypes = this.getContractMethodArgsTypes(contractAddress, methodName);
+        if (contractConstructorArgsTypes.success) {
+          let newArgs = utils.twoDimensionalArray(args, contractConstructorArgsTypes);
+          let contractCallData = {
+            chainId: API_CHAIN_ID,
+            sender: sender,
+            contractAddress: contractAddress,
+            value: value,
+            gasLimit: response.result.gasLimit,
+            price: 25,
+            methodName: methodName,
+            methodDesc: methodDesc,
+            args: newArgs
+          };
+          return {success: true, data: contractCallData}
+        }
+      } else {
+        return {success: false, msg: response.result.msg, code: 1001};
+      }
+    })
+    .catch((error) => {
+      return {success: false, msg: error, code: 10001};
+    });
+}
+
+/**
+ * 获取合约指定函数的参数类型
+ * @param contractAddress
+ * @param  methodName
+ */
+export async function getContractMethodArgsTypes(contractAddress, methodName) {
+  return await this.$post('/', 'getContractMethodArgsTypes', [contractAddress, methodName])
+    .then((response) => {
+      if (response.hasOwnProperty("result")) {
+        return {success: true, data: response.result};
+      } else {
+        return {success: false, msg: response.result.msg, code: 1002};
+      }
+    })
+    .catch((error) => {
+      return {success: false, msg: error, code: 10002};
+    });
+}
 
 /**
  * 连接跳转
  * @param name
- * @param parameter {}
+ * @param parameter
  * @param type 0:路由跳转 1：连接跳转（浏览器、其他地址）
  */
 export function connect(name, parameter, type = 0) {

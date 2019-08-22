@@ -81,14 +81,12 @@
   import sdk from 'nuls-sdk-js/lib/api/sdk'
   import utils from 'nuls-sdk-js/lib/utils/utils'
   import Password from '@/components/PasswordBar'
-  import {API_CHAIN_ID, NRC20_HEX, NRC_721} from '@/config'
+  import {API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721} from '@/config'
   import {
     getBalanceOrNonceByAddress,
     countFee,
     inputsOrOutputs,
-    getContractConstructor,
-    validateAndBroadcast,
-    getPrefixByChainId
+    validateAndBroadcast
   } from '@/api/requestData'
 
   export default {
@@ -227,7 +225,7 @@
        **/
       async passSubmit(password) {
         const pri = nuls.decrypteOfAES(this.accountInfo.aesPri, password);
-        const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password);
+        const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password, API_PREFIX);
         let amount = this.contractCreateTxData.gasLimit * this.contractCreateTxData.price;
         if (newAddressInfo.address === this.accountInfo.address) {
           let transferInfo = {

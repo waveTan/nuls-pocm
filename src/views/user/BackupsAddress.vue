@@ -45,7 +45,7 @@
 <script>
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
-  import {chainID} from '@/api/util'
+  import {API_CHAIN_ID, API_PREFIX} from '@/config'
 
   export default {
     components: {Password},
@@ -63,7 +63,7 @@
        **/
       async passSubmit(password) {
         const pri = nuls.decrypteOfAES(this.accountAddress.aesPri, password);
-        const newAddressInfo = nuls.importByKey(chainID(), pri, password);
+        const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password, API_PREFIX);
         if (newAddressInfo.address === this.accountAddress.address) {
           this.keyDialog = true;
           this.accountAddress.pri = pri;
@@ -104,7 +104,7 @@
 
   .backups-address {
     .bg-white {
-      .title{
+      .title {
         margin: 20px auto 0;
       }
     }

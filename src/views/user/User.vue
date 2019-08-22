@@ -98,8 +98,7 @@
        * @author: Wave
        */
       handleClick(tab, event) {
-        console.log(tab.name);
-        //console.log(tab, event);
+        console.log(tab, event);
       },
 
       /**
@@ -115,6 +114,10 @@
             //console.log(response);
             if (response.success) {
               this.accountInfo = {};
+              for (let item of response.result.list) {
+                item.createTime = moment(getLocalTime(item.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');
+              }
+              this.passportList = [...response.result.list];
               response.data.balance = timesDecimals(response.data.balance);
               this.accountInfo = {...newData, ...response.data};
             } else {
@@ -166,29 +169,6 @@
           .catch((error) => {
             console.log(error)
           })
-      },
-
-      /**
-       * @disc: 获取账户信息根据地址
-       * @params:address
-       * @date: 2019-08-20 17:00
-       * @author: Wave
-       */
-      async addressInfoByAddress(address) {
-        await this.$post('/', 'getAccountContractList', [this.pageIndex, this.pageSize, address, false, false])
-          .then((response) => {
-            console.log(response);
-            if (response.hasOwnProperty("result")) {
-              for (let item of response.result.list) {
-                item.createTime = moment(getLocalTime(item.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');
-              }
-              this.passportList = [...response.result.list]
-            }
-          })
-        /*if (addressInfo.success) {
-        } else {
-          this.$message({message: "创建地址获取地址信息错误: " + addressInfo.data.error.message, type: 'error', duration: 2000});
-        }*/
       },
 
     },

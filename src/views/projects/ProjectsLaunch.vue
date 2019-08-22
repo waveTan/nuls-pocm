@@ -151,7 +151,7 @@
         }
       };
       let checkWebsite = (rule, value, callback) => {
-        let regular = /^((ht|f)tps?):\/\/([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/;
+        let regular = /^((ht|f)tps?):\/\/([\\w\\-]+(\.[\\w\\-]+)*\/)*[\\w\\-]+(\.[\\w\\-]+)*\/?(\?([\\w\\-\\.,@?^=%&:\\/~\\+#]*)+)?/;
         if (!value) {
           return callback(new Error('请输入官网地址'));
         } else if (!regular.exec(value)) {
