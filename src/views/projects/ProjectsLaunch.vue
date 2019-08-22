@@ -73,6 +73,7 @@
 <script>
   import axios from 'axios'
   import {stringLength} from '@/api/util'
+  import {POCM_API_URL} from '@/config'
 
   export default {
     data() {
@@ -274,7 +275,7 @@
        **/
       launch(data) {
         console.log(data);
-        const url = 'http://192.168.1.39:8080/pocm/release';
+        const url = POCM_API_URL + '/pocm/release';
         axios.post(url, data)
           .then((response) => {
             console.log(response.data);

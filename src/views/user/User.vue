@@ -64,8 +64,9 @@
 <script>
   import axios from 'axios'
   import moment from 'moment'
-  import {timesDecimals,getLocalTime} from '@/api/util'
+  import {timesDecimals, getLocalTime} from '@/api/util'
   import {getAddressInfoByAddress} from '@/api/requestData'
+  import {POCM_API_URL} from '@/config'
 
   export default {
     data() {
@@ -132,7 +133,7 @@
        * @author: Wave
        */
       selectDataByStatus() {
-        const url = 'http://192.168.1.39:8080/pocm/release/list';
+        const url = POCM_API_URL + '/pocm/release/list';
         const data = {status: 0};
         axios.post(url, data)
           .then((response) => {
@@ -154,7 +155,7 @@
        * @author: Wave
        */
       projectListById(Id) {
-        const url = 'http://192.168.1.39:8080/pocm/mining/list';
+        const url = POCM_API_URL + '/pocm/mining/list';
         const data = {releaseId: Id};
         axios.post(url, data)
           .then((response) => {

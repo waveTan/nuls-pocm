@@ -5,7 +5,9 @@ export const API_CHAIN_ID = 2;
 //链前缀
 export const API_PREFIX = 'tNULS';
 //燃烧地址的公钥
-export const API_BURNING_ADDRESS_PUB = '0298f88c3cae67385ce3cbee00f78816db3e56e566b62bd0f4c5b45f205d3021c3';
+export const API_BURNING_ADDRESS_PUB = '000000000000000000000000000000000000000000000000000000000000000000';
+//正式、测试网络的api
+export let POCM_API_URL = IS_DEV ? 'http://192.168.1.39:8080' : 'http://192.168.1.39:8080';
 //正式、测试网络的api
 export let API_URL = IS_DEV ? 'http://192.168.1.39:18003' : 'http://apitn1.nulscan.io/';
 //请求最迟时间

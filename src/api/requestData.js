@@ -90,14 +90,14 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
   let outputs = [];
   if (type === 15) {
     //TODO 10个nuls 手续费
-   /* inputs[0].amount = 10 * 100000000;
+    inputs[0].amount = 10 * 100000000;
     outputs = [{
       address: nuls.getAddressByPub(API_CHAIN_ID, 1, API_BURNING_ADDRESS_PUB, API_PREFIX),
       assetsChainId: API_CHAIN_ID,
       assetsId: 1,
       amount: Number(Minus(inputs[0].amount, newAmount)),
       lockTime: newLockTime
-    }];*/
+    }];
     return {success: true, data: {inputs: inputs, outputs: outputs}};
   }
   if (type === 16) {

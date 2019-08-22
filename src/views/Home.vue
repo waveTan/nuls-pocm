@@ -41,7 +41,8 @@
         <h6></h6>
       </div>
       <div class="hot_list w1200">
-        <div class="p_list shadow fl" v-for="(item,index) in projectsList" :key="index" @click="toUrl('projectsInfo',item.id)">
+        <div class="p_list shadow fl" v-for="(item,index) in projectsList" :key="index"
+             @click="toUrl('projectsInfo',item.id)">
           <img src="./../assets/img/list_bg.png"/>
           <h2 class="font18">{{item.name}}</h2>
           <h6>{{item.projectCard}}</h6>
@@ -55,10 +56,12 @@
 
 <script>
   import axios from 'axios'
+  import {POCM_API_URL} from '@/config'
+
   export default {
     data() {
       return {
-        projectsList:[],//项目列表
+        projectsList: [],//项目列表
       };
     },
     created() {
@@ -72,7 +75,7 @@
        * @author: Wave
        */
       selectDataByStatus() {
-        const url = 'http://192.168.1.39:8080/pocm/release/list';
+        const url = POCM_API_URL + '/pocm/release/list';
         const data = {status: 0};
         axios.post(url, data)
           .then((response) => {
@@ -107,14 +110,14 @@
       background: linear-gradient(to right, #4ef16a, #0ede94);
       height: 500px;
       width: 100%;
-      .img_bg{
+      .img_bg {
         margin: 15px 0 0 0;
       }
     }
     .investor {
       height: 600px;
       width: 100%;
-      .img_bg{
+      .img_bg {
         margin: 100px 0 0 0;
       }
     }
@@ -122,31 +125,33 @@
       height: 600px;
       width: 100%;
       background-color: #f8f8f8;
-      .img_bg{
+      .img_bg {
         margin: 150px 0 0 0;
       }
     }
-    .hot{
+    .hot {
       height: 790px;
       margin: 0 0 60px 0;
-      .hot_title{
+      .hot_title {
         width: 105px;
         margin: 0 auto;
-        h2{
+        h2 {
           margin: 50px auto 5px;
           text-align: center;
           line-height: 40px;
         }
-        h6{
+        h6 {
           background: linear-gradient(to right, #4ef16a, #0ede94);
           height: 5px;
         }
       }
-      .hot_list{
+      .hot_list {
         margin: 100px auto 0;
-        .p_list{
+        .p_list {
           margin: 0 30px;
-          img{width: 220px;}
+          img {
+            width: 220px;
+          }
         }
       }
     }

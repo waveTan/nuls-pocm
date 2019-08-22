@@ -20,6 +20,7 @@
 
 <script>
   import axios from 'axios'
+  import {POCM_API_URL} from '@/config'
 
   export default {
     data() {
@@ -39,7 +40,9 @@
        * @author: Wave
        */
       selectDataByStatus() {
-        const url = 'http://192.168.1.39:8080/pocm/release/list';
+        const url = POCM_API_URL +'/pocm/release/list';
+        //const url = 'http://192.168.1.39:8080/pocm/release/list';
+        console.log(url);
         const data = {status: 0};
         axios.post(url, data)
           .then((response) => {

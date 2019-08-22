@@ -67,6 +67,7 @@
 
 <script>
   import axios from 'axios'
+  import {POCM_API_URL} from '@/config'
 
   export default {
     data() {
@@ -132,7 +133,7 @@
        * @author: Wave
        */
       selectDataByStatus(releaseId) {
-        const url = 'http://192.168.1.39:8080/pocm/release/' + releaseId;
+        const url = POCM_API_URL + '/pocm/release/' + releaseId;
         axios.get(url)
           .then((response) => {
             console.log(response.data);
