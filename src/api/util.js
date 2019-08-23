@@ -1,7 +1,8 @@
 import {BigNumber} from 'bignumber.js'
-import utils from 'nuls-sdk-js/lib/utils/utils'
 import nuls from 'nuls-sdk-js'
+import utils from 'nuls-sdk-js/lib/utils/utils'
 import {API_CHAIN_ID, API_PREFIX} from '@/config'
+import {post} from './https'
 
 /**
  * 10的N 次方
@@ -89,7 +90,7 @@ export function passwordVerification(accountInfo, password) {
   const pri = nuls.decrypteOfAES(accountInfo.aesPri, password);
   const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password, API_PREFIX);
   if (newAddressInfo.address === accountInfo.address) {
-    return {success: true};
+    return {success: true, pri: pri, pub: accountInfo.pub};
   } else {
     return {success: false};
   }
@@ -139,18 +140,12 @@ export function stringLength(string) {
  * @param args
  */
 export async function validateContractCall(sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args) {
-  return await this.$post('/', 'validateContractCall', [sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args])
-    .then((response) => {
-      //console.log(response);
-      if (response.result.success) {
-        this.imputedContractCallGas(sender, value, contractAddress, methodName, methodDesc, args)
-      } else {
-        return {success: false, msg: response.result.msg, code: 1000};
-      }
-    })
-    .catch((error) => {
-      return {success: false, msg: error, code: 10000};
-    });
+  let newData = await post('/', 'validateContractCall', [sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args]);
+  if (newData.result.success) {
+    return imputedContractCallGas(sender, value, contractAddress, methodName, methodDesc, args)
+  } else {
+    return {success: false, code: 1000};
+  }
 }
 
 /**
@@ -163,33 +158,28 @@ export async function validateContractCall(sender, value, gasLimit, price, contr
  * @param args
  */
 export async function imputedContractCallGas(sender, value, contractAddress, methodName, methodDesc, args) {
-  return await this.$post('/', 'imputedContractCallGas', [sender, value, contractAddress, methodName, methodDesc, args])
-    .then((response) => {
-      //console.log(response.result);
-      if (response.hasOwnProperty("result")) {
-        let contractConstructorArgsTypes = this.getContractMethodArgsTypes(contractAddress, methodName);
-        if (contractConstructorArgsTypes.success) {
-          let newArgs = utils.twoDimensionalArray(args, contractConstructorArgsTypes);
-          let contractCallData = {
-            chainId: API_CHAIN_ID,
-            sender: sender,
-            contractAddress: contractAddress,
-            value: value,
-            gasLimit: response.result.gasLimit,
-            price: 25,
-            methodName: methodName,
-            methodDesc: methodDesc,
-            args: newArgs
-          };
-          return {success: true, data: contractCallData}
-        }
-      } else {
-        return {success: false, msg: response.result.msg, code: 1001};
-      }
-    })
-    .catch((error) => {
-      return {success: false, msg: error, code: 10001};
-    });
+  let newData = await post('/', 'imputedContractCallGas', [sender, value, contractAddress, methodName, methodDesc, args]);
+  if (newData.hasOwnProperty("result")) {
+    let contractConstructorArgsTypes = await getContractMethodArgsTypes(contractAddress, methodName);
+    if (contractConstructorArgsTypes.success) {
+      let newArgs = utils.twoDimensionalArray(args, contractConstructorArgsTypes);
+      let contractCallData = {
+        chainId: API_CHAIN_ID,
+        sender: sender,
+        contractAddress: contractAddress,
+        value: value,
+        gasLimit: newData.result.gasLimit,
+        price: 25,
+        methodName: methodName,
+        methodDesc: methodDesc,
+        args: newArgs
+      };
+      //console.log(contractCallData);
+      return {success: true, data: contractCallData};
+    } else {
+      return {success: false, code: 1001};
+    }
+  }
 }
 
 /**
@@ -198,17 +188,12 @@ export async function imputedContractCallGas(sender, value, contractAddress, met
  * @param  methodName
  */
 export async function getContractMethodArgsTypes(contractAddress, methodName) {
-  return await this.$post('/', 'getContractMethodArgsTypes', [contractAddress, methodName])
-    .then((response) => {
-      if (response.hasOwnProperty("result")) {
-        return {success: true, data: response.result};
-      } else {
-        return {success: false, msg: response.result.msg, code: 1002};
-      }
-    })
-    .catch((error) => {
-      return {success: false, msg: error, code: 10002};
-    });
+  let data = await post('/', 'getContractMethodArgsTypes', [contractAddress, methodName]);
+  if (data.hasOwnProperty("result")) {
+    return {success: true, data: data.result};
+  } else {
+    return {success: false, msg: data.result.msg, code: 1002};
+  }
 }
 
 /**

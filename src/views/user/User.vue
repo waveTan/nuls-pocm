@@ -40,6 +40,11 @@
         <el-tab-pane label="我的通证" name="myPassport">
           <el-table :data="passportList" :stripe="true" class="tables">
             <el-table-column prop="tokenType" label="通证类型" width="150">
+              <template slot-scope="scope">
+                <span v-if="scope.row.tokenType === 0 ">非token</span>
+                <span v-else-if="scope.row.tokenType === 1">NRC20</span>
+                <span v-else="scope.row.tokenType === 2">NRC721</span>
+              </template>
             </el-table-column>
             <el-table-column prop="createTime" label="创建时间" width="180">
             </el-table-column>
@@ -48,6 +53,10 @@
             <el-table-column prop="contractAddress" label="合约地址" min-width="330">
             </el-table-column>
             <el-table-column prop="status" label="状态" width="150">
+              <template slot-scope="scope">
+                <span v-if="scope.row.status === 0 ">未认证</span>
+                <span v-else="scope.row.status === 1">已经认证</span>
+              </template>
             </el-table-column>
             <el-table-column label="操作" min-width="100">
               <template slot-scope="scope">

@@ -76,7 +76,7 @@
        */
       selectDataByStatus() {
         const url = POCM_API_URL + '/pocm/release/list';
-        const data = {status: 0};
+        const data = {status: 1};
         axios.post(url, data)
           .then((response) => {
             if (response.data.success) {

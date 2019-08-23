@@ -34,14 +34,15 @@
               {{projectsInfo.tokenSymbol}} 总量</font></li>
             <li><span class="fl">可挖矿数量</span><font class="fl">{{projectsInfo.tokenMiningPercent}}%
               {{projectsInfo.tokenSymbol}} 总量</font></li>
-            <li><span class="fl">最低抵押NULS数量</span><font class="fl">1000 NULS</font></li>
-            <li><span class="fl">已抵押NULS数量</span><font class="fl">55555 NULS</font></li>
-            <li><span class="fl">已抵押NULS地址数</span><font class="fl">369 个</font></li>
-            <li><span class="fl">奖励发放周期</span><font class="fl">30 个区块</font></li>
-            <li><span class="fl">单月可获得Token数/10K NULS</span><font class="fl">36.26 {{projectsInfo.tokenSymbol}}</font>
+            <li><span class="fl">最低抵押NULS数量</span><font class="fl">{{projectsInfo.minimumDeposit}} NULS</font></li>
+            <li><span class="fl">已抵押NULS数量</span><font class="fl">{{projectsInfo.tokenTotalSupply}} NULS</font></li>
+            <li><span class="fl">已抵押NULS地址数</span><font class="fl">{{projectsInfo.depositCount}} 个</font></li>
+            <li><span class="fl">奖励发放周期</span><font class="fl">{{projectsInfo.awardingCycle}} 个区块</font></li>
+            <li><span class="fl">单月可获得Token数/10K NULS</span><font class="fl">{{projectsInfo.tokenPer10000NULSPerMonth}}
+              {{projectsInfo.tokenSymbol}}</font>
             </li>
-            <li><span class="fl">奖励减半周期</span><font class="fl">不减半</font></li>
-            <li><span class="fl">预计完成挖矿时间</span><font class="fl">2019-09-11 15:15:52</font></li>
+            <li><span class="fl">奖励减半周期</span><font class="fl">{{projectsInfo.rewardHalvingCycle}}</font></li>
+            <li><span class="fl">预计完成挖矿时间</span><font class="fl">{{projectsInfo.completeMiningTime}}</font></li>
           </ul>
         </div>
         <div class="div_info cb">
@@ -53,7 +54,7 @@
       </div>
       <div class="right fr">
         <div class="entrust shadow">
-          <h3>预计挖矿结束时间: 2019-08-11 15:08:18</h3>
+          <h3>预计挖矿结束时间: {{projectsInfo.completeMiningTime}}</h3>
           <el-form :model="entrustForm" status-icon :rules="entrustRules" ref="entrustForm" class="entrust_form">
             <div class="tr font12 balance">余额: {{accountInfo.balance/100000000}} <span class="fCN">NULS</span></div>
             <el-form-item label="" prop="number">
@@ -73,11 +74,26 @@
 
 <script>
   import axios from 'axios'
+  import moment from 'moment'
   import nuls from 'nuls-sdk-js'
   import {POCM_API_URL, API_CHAIN_ID, API_PREFIX} from '@/config'
   import Password from '@/components/PasswordBar'
-  import {timesDecimals, Times, Plus, validateContractCall, connect} from '@/api/util'
-  import {inputsOrOutputs, countFee, validateAndBroadcast, passwordVerification} from '@/api/requestData'
+  import {
+    timesDecimals,
+    divisionDecimals,
+    Times,
+    Plus,
+    validateContractCall,
+    connect,
+    getLocalTime,
+    passwordVerification
+  } from '@/api/util'
+  import {
+    inputsOrOutputs,
+    countFee,
+    validateAndBroadcast,
+    getBalanceOrNonceByAddress
+  } from '@/api/requestData'
 
   export default {
     data() {
@@ -98,7 +114,8 @@
       };
       return {
         accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
-        releaseId: this.$route.query.releaseId,//合约地址
+        balanceInfo: {},//账户余额信息
+        releaseId: this.$route.query.releaseId,//项目ID
         projectsInfo: {},//项目信息
         chartData: {
           columns: ['allocation', 'percent'],
@@ -109,16 +126,15 @@
             {allocation: '团队', percent: 20},
           ]
         },
-
+        contractCallData: [],
         entrustForm: {
-          number: ''
+          number: 2000
         },
         entrustRules: {
           number: [
             {validator: checkNumber, trigger: 'blur'}
           ]
         },
-        contractCallData: [],
       };
     },
     created() {
@@ -139,8 +155,11 @@
         const url = POCM_API_URL + '/pocm/release/' + releaseId;
         axios.get(url)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
+              response.data.data.minimumDeposit = divisionDecimals(response.data.data.minimumDeposit);
+              //response.data.data.minimumDeposit =divisionDecimals(response.data.data.minimumDeposit);
+              response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
             }
           })
@@ -158,8 +177,8 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log(timesDecimals(this.entrustForm.number));
-            this.validateContractCall(this.accountInfo.address, timesDecimals(this.entrustForm.number), 1, 25, contractAddress, 'depositForOwn', '', []);
+            this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
+            this.validateContractCall(this.accountInfo.address, timesDecimals(this.entrustForm.number), 10000000, 25, this.projectsInfo.contractAddress, 'depositForOwn', '', []);
           } else {
             return false;
           }
@@ -181,8 +200,12 @@
        */
       async validateContractCall(sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args) {
         let contractCall = await validateContractCall(sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args);
+        //console.log(contractCall);
         if (contractCall.success) {
+          this.contractCallData = contractCall.data;
           this.$refs.password.showPassword(true);
+        } else {
+          this.$message({message: "合约调用验证交易错误：" + contractCall.msg, type: 'error', duration: 3000});
         }
       },
 
@@ -193,8 +216,7 @@
       async passSubmit(password) {
         let isPassword = await passwordVerification(this.accountInfo, password);
         if (isPassword.success) {
-          let pub = this.accountInfo.pub;
-          let amount = Number(Times(this.contractCallData.gas, this.contractCallData.price));
+          let amount = Number(Times(this.contractCallData.gasLimit, this.contractCallData.price));
           amount = Number(Plus(this.contractCallData.value, amount));
           let transferInfo = {
             fromAddress: this.accountInfo.address,
@@ -205,8 +227,8 @@
           };
           if (this.contractCallData.value > 0) {
             transferInfo.toAddress = this.contractCallData.contractAddress;
-            transferInfo.value = Number(Times(this.contractCallData.value, 100000000));
-            transferInfo.amount = Number(Plus(transferInfo.value, amount))
+            transferInfo.value = this.contractCallData.value;
+            transferInfo.amount = amount
           }
           let remark = '';
           let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 16);
@@ -220,31 +242,46 @@
             transferInfo.fee = newFee;
             inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 16);
             tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 16, this.contractCallData);
-            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+            txhex = await nuls.transactionSerialize(isPassword.pri, isPassword.pub, tAssemble);
           } else {
-            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+            txhex = await nuls.transactionSerialize(isPassword.pri, isPassword.pub, tAssemble);
           }
           //console.log(txhex);
           //验证并广播交易
           await validateAndBroadcast(txhex).then((response) => {
             //console.log(response);
             if (response.success) {
-              console.log(response);
-              //this.callResult = response
+              this.entrustForm.number = '';
+              this.$message({message: "委托交易已经发出，区块确定需要一定的时间，你可以在浏览器上查询交易是否已确定", type: 'success', duration: 2000});
             } else {
-              if (response.data.code === 'err_0014') {
-                this.$message({message: response.data.message, type: 'error', duration: 3000});
-              } else {
-
-                this.$message({message: this.$t('error.' + response.data.code), type: 'error', duration: 3000});
-              }
+              this.$message({message: "广播交易失败", type: 'error', duration: 3000});
             }
           }).catch((err) => {
-            this.$message({message: this.$t('public.err1') + err, type: 'error', duration: 1000});
+            this.$message({message: "广播交易异常：" + JSON.stringify(err), type: 'error', duration: 1000});
           });
         } else {
-          this.$message({message: this.$t('address.address13'), type: 'error', duration: 1000});
+          this.$message({message: "对不起，密码错误！", type: 'error', duration: 1000});
         }
+      },
+
+      /**
+       * 获取账户余额
+       * @param chainId
+       * @param assetId
+       * @param address
+       **/
+      getBalanceByAddress(chainId, assetId, address) {
+        getBalanceOrNonceByAddress(chainId, assetId, address).then((response) => {
+          //console.log(response);
+          if (response.success) {
+            this.balanceInfo = response.data;
+          } else {
+            this.$message({message: "获取账户余额错误", type: 'error', duration: 1000});
+          }
+        }).catch((error) => {
+          console.log(error);
+          this.$message({message: "获取账户余额异常", type: 'error', duration: 1000});
+        });
       },
 
       /**

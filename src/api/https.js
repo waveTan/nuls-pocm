@@ -13,17 +13,14 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
  * @param data
  * @returns {Promise}
  */
-export function post(url, methodName, data = []) {
-  return new Promise((resolve, reject) => {
-    data.unshift(API_CHAIN_ID);
-    const params = {"jsonrpc": "2.0", "method": methodName, "params": data, "id": 5898};
-    /* console.log(url);
-     console.log(params);*/
-    axios.post(url, params)
-      .then(response => {
-        resolve(response.data)
-      }, err => {
-        reject(err)
-      })
-  })
+
+export async function post(url, methodName, data = []) {
+  data.unshift(API_CHAIN_ID);
+  const parameter = {"jsonrpc": "2.0", "method": methodName, "params": data, "id": 5898};
+  try {
+    let res = await axios.post(url, parameter);
+    return res.data;
+  } catch (err) {
+    return err
+  }
 }

@@ -205,8 +205,8 @@
           introduction: 'wave wave wave wave ',
           mainFunctionPoints: 'wave wave wave wave wave',
           tokenAllocationList: [{
-            allocation: 'wave所有',
-            percent: '100',
+            allocation: '',
+            percent: '',
             key: Date.now()
           }]
         },
@@ -226,7 +226,6 @@
       };
     },
     created() {
-      console.log(stringLength(this.launchForm.name));
     },
     mounted() {
     },
@@ -261,8 +260,8 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log(this.launchForm);
-            //this.launch(this.launchForm);
+            //console.log(this.launchForm);
+            this.launch(this.launchForm);
           } else {
             return false;
           }
@@ -274,7 +273,6 @@
        * @param data
        **/
       launch(data) {
-        console.log(data);
         const url = POCM_API_URL + '/pocm/release';
         axios.post(url, data)
           .then((response) => {
