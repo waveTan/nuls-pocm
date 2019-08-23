@@ -9,7 +9,7 @@ import ProjectsList from './views/projects/ProjectsList'
 import ProjectsInfo from './views/projects/ProjectsInfo'
 import ProjectsLaunch from './views/projects/ProjectsLaunch'
 import NewToken from './views/token/NewToken'
-import CodeToken from './views/token/CodeToken'
+import NewPocm from './views/token/NewPocm'
 
 Vue.use(Router);
 
@@ -61,9 +61,9 @@ export default new Router({
       component: NewToken
     },
     {
-      path: '/Token/CodeToken',
-      name: 'codeToken',
-      component: CodeToken
+      path: '/Token/NewPocm',
+      name: 'newPocm',
+      component: NewPocm
     }
   ]
 })

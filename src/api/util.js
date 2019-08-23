@@ -141,10 +141,11 @@ export function stringLength(string) {
  */
 export async function validateContractCall(sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args) {
   let newData = await post('/', 'validateContractCall', [sender, value, gasLimit, price, contractAddress, methodName, methodDesc, args]);
+  //console.log(newData);
   if (newData.result.success) {
     return imputedContractCallGas(sender, value, contractAddress, methodName, methodDesc, args)
   } else {
-    return {success: false, code: 1000};
+    return {success: false, code: 1000, msg: newData.result.msg};
   }
 }
 

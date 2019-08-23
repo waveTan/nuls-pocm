@@ -66,7 +66,7 @@
         }else if(key === 'signOut') {
           this.signOut();
         }else if(key === 'code') {
-          this.toUrl('codeToken')
+          this.toUrl('newPocm')
         }
       },
 
