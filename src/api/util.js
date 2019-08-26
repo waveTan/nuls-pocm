@@ -203,14 +203,19 @@ export async function getContractMethodArgsTypes(contractAddress, methodName) {
  * @param parameter
  * @param type 0:路由跳转 1：连接跳转（浏览器、其他地址）
  */
-export function connect(name, parameter, type = 0) {
+export function connect(name, parameter, type) {
   if (type === 0) {
-    this.$router.push({
-      name: name,
-      query: parameter
-    });
+    let newQuery = {};
+    let newPush = {name: name};
+    if (!parameter) {
+      if (name === 'projectsInfo') {
+        newQuery = {releaseId: parameter}
+      }
+      newPush.query = newQuery;
+    }
+    return {success: true, data: newPush};
   } else {
-    window.open(name, '_blank');
+    connect(name);
+    return {success: true, data: {}};
   }
-
 }

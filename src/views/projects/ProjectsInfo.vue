@@ -55,7 +55,8 @@
       <div class="right fr">
         <div class="entrust shadow">
           <h3>预计挖矿结束时间: {{projectsInfo.completeMiningTime}}</h3>
-          <el-form :model="entrustForm" status-icon :rules="entrustRules" ref="entrustForm" class="entrust_form">
+          <el-form :model="entrustForm" status-icon :rules="entrustRules" ref="entrustForm" class="entrust_form"
+                   v-show="accountInfo.address">
             <div class="tr font12 balance">余额: {{accountInfo.balance/100000000}} <span class="fCN">NULS</span></div>
             <el-form-item label="" prop="number">
               <el-input v-model="entrustForm.number" placeholder="请输入委托NULS数量"></el-input>
@@ -64,6 +65,10 @@
               <el-button class="btn" @click="submitForm('entrustForm')">参与委托</el-button>
             </el-form-item>
           </el-form>
+          <div class="tc">
+            <el-button class="i_bt" @click="toUrl('importAddress','',0)">导入账户</el-button>
+            <el-button class="n_bt" @click="toUrl('newAddress','',0)">创建账户</el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -76,7 +81,7 @@
   import axios from 'axios'
   import moment from 'moment'
   import nuls from 'nuls-sdk-js'
-  import {POCM_API_URL, API_CHAIN_ID, API_PREFIX} from '@/config'
+  import {POCM_API_URL, API_CHAIN_ID} from '@/config'
   import Password from '@/components/PasswordBar'
   import {
     timesDecimals,
@@ -86,7 +91,7 @@
     validateContractCall,
     connect,
     getLocalTime,
-    passwordVerification
+    passwordVerification,
   } from '@/api/util'
   import {
     inputsOrOutputs,
@@ -113,7 +118,7 @@
         metrics: 'percent'
       };
       return {
-        accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
+        accountInfo: localStorage.hasOwnProperty('accountInfo') ? JSON.parse(localStorage.getItem('accountInfo')) : {balance: 0},//账户信息
         balanceInfo: {},//账户余额信息
         releaseId: this.$route.query.releaseId,//项目ID
         projectsInfo: {},//项目信息
@@ -151,14 +156,13 @@
        * @date: 2019-08-20 17:51
        * @author: Wave
        */
-      selectDataByStatus(releaseId) {
+      async selectDataByStatus(releaseId) {
         const url = POCM_API_URL + '/pocm/release/' + releaseId;
-        axios.get(url)
+        await axios.get(url)
           .then((response) => {
             //console.log(response.data);
             if (response.data.success) {
               response.data.data.minimumDeposit = divisionDecimals(response.data.data.minimumDeposit);
-              //response.data.data.minimumDeposit =divisionDecimals(response.data.data.minimumDeposit);
               response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
             }
@@ -291,7 +295,10 @@
        * @author: Wave
        */
       toUrl(name, parameter, type) {
-        connect(name, parameter, type)
+        let newPush = connect(name, parameter, type);
+        if (newPush.success) {
+          this.$router.push(newPush.data);
+        }
       },
     }
   }
@@ -299,7 +306,6 @@
 
 <style lang="less">
   .projects_info {
-
     .projects_top {
       background-color: #17202e;
       height: 300px;
@@ -328,7 +334,6 @@
         }
       }
     }
-
     .projects_bottom {
       .left {
         width: 700px;
@@ -375,6 +380,17 @@
               margin: 10px 0 0 0 !important;
             }
           }
+        }
+        .i_bt, .n_bt {
+          width: 250px;
+          float: none;
+        }
+        .i_bt {
+          background: linear-gradient(to right, #4ef16a, #0ede94) !important;
+          color: #FFFFFF;
+        }
+        .n_bt {
+          margin: 20px 0 0 0;
         }
       }
     }

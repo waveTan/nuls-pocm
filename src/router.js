@@ -4,6 +4,7 @@ import Home from './views/Home'
 import NewAddress from './views/user/NewAddress'
 import ImportAddress from './views/user/ImportAddress'
 import BackupsAddress from './views/user/BackupsAddress'
+import PocmUser from './views/user/PocmUser'
 import User from './views/user/User'
 import ProjectsList from './views/projects/ProjectsList'
 import ProjectsInfo from './views/projects/ProjectsInfo'
@@ -39,6 +40,11 @@ export default new Router({
       path: '/User',
       name: 'user',
       component: User
+    },
+    {
+      path: '/PocmUser',
+      name: 'pocmUser',
+      component: PocmUser
     },
     {
       path: '/Projects/ProjectsList',

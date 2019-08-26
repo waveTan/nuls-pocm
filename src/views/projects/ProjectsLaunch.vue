@@ -57,8 +57,8 @@
               </el-input>
               <el-input v-model="domain.percent" placeholder="比例" class="proportion fl">
               </el-input>
-              <i class="el-icon-remove-outline" @click.prevent="removeDomain(domain)"></i>
               <i class="el-icon-circle-plus-outline" @click="addDomain"></i>
+              <i class="el-icon-remove-outline" v-show="index > 0" @click.prevent="removeDomain(domain)"></i>
             </el-form-item>
           </div>
           <el-form-item class="tc">
@@ -78,8 +78,11 @@
   export default {
     data() {
       let checkName = (rule, value, callback) => {
+        let regular = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
         if (!value) {
           return callback(new Error('请输入您的项目名称'));
+        } else if (!regular.exec(value)) {
+          return callback(new Error('请输入项目名称(只允许使用小写字母、数字、下划线（下划线不能在两端）)'));
         } else if (2 > stringLength(value) || 16 < stringLength(value)) {
           return callback(new Error('项目名称长度为2-16'));
         } else {
@@ -193,17 +196,17 @@
 
       return {
         launchForm: {
-          name: 'wave提交',
-          email: 'wave@qq.com',
-          tokenTotalSupply: '987654321',
-          tokenInitialCirculatingPercent: '20',
-          tokenMiningPercent: '40',
-          tokenName: 'wave',
-          tokenSymbol: 'wave',
-          website: 'https://www.wave.com',
-          projectCard: 'wave wave wave',
-          introduction: 'wave wave wave wave ',
-          mainFunctionPoints: 'wave wave wave wave wave',
+          name: '',
+          email: '',
+          tokenTotalSupply: '',
+          tokenInitialCirculatingPercent: '',
+          tokenMiningPercent: '',
+          tokenName: '',
+          tokenSymbol: '',
+          website: '',
+          projectCard: '',
+          introduction: '',
+          mainFunctionPoints: '',
           tokenAllocationList: [{
             allocation: '',
             percent: '',
@@ -260,7 +263,6 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            //console.log(this.launchForm);
             this.launch(this.launchForm);
           } else {
             return false;
@@ -276,10 +278,18 @@
         const url = POCM_API_URL + '/pocm/release';
         axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
+            if (response.data.success) {
+              this.$message({message: "您的信息我们已经收到，我们会稍后联系您！", type: 'success', duration: 3000});
+            } else {
+              this.$message({message: "对不起，提交信息错误，请刷新重试！", type: 'success', duration: 3000});
+            }
+            this.$refs['launchForm'].resetFields();
           })
           .catch((error) => {
-            console.log(error)
+            console.log(error);
+            this.$message({message: "对不起，提交信息异常，请刷新重试！", type: 'success', duration: 3000});
+            this.$refs['launchForm'].resetFields();
           })
       },
 
@@ -352,7 +362,7 @@
               cursor: pointer;
               color: #0ede94;
             }
-            .el-icon-remove-outline {
+            .el-icon-circle-plus-outline {
               margin: 0 5px;
             }
           }

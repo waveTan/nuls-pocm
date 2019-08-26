@@ -2,7 +2,7 @@
   <div class="new_token">
     <div class="token_bg">
       <div class="bg-white shadow w1200 token_inf">
-        <el-tabs v-model="activeName" @tab-click="handleClick" class="token_tab">
+        <el-tabs v-model="activeName" class="token_tab">
           <el-tab-pane label="发行NRC-20通证" name="nrc20">
             <div class="div_tip">
               NRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXX
@@ -77,43 +77,53 @@
 </template>
 
 <script>
+  import axios from 'axios'
   import nuls from 'nuls-sdk-js'
   import sdk from 'nuls-sdk-js/lib/api/sdk'
   import utils from 'nuls-sdk-js/lib/utils/utils'
   import Password from '@/components/PasswordBar'
-  import {API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721} from '@/config'
+  import {POCM_API_URL, API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721} from '@/config'
   import {
     getBalanceOrNonceByAddress,
     countFee,
     inputsOrOutputs,
-    validateAndBroadcast
+    validateAndBroadcast,
+    getContractConstructor
   } from '@/api/requestData'
 
   export default {
     data() {
       let checkName20 = (rule, value, callback) => {
-        if (!value) {
+        if (!this.accountInfo) {
+          return callback(new Error('请先登录！'));
+        } else if (!value) {
           return callback(new Error('通证名称不能为空!'));
         } else {
           callback();
         }
       };
       let checkSymbol20 = (rule, value, callback) => {
-        if (!value) {
+        if (!this.accountInfo) {
+          return callback(new Error('请先登录！'));
+        } else if (!value) {
           return callback(new Error('通证缩写不能为空!'));
         } else {
           callback();
         }
       };
       let checkCirculation = (rule, value, callback) => {
-        if (!value) {
+        if (!this.accountInfo) {
+          return callback(new Error('请先登录！'));
+        } else if (!value) {
           return callback(new Error('发行总量不能为空!'));
         } else {
           callback();
         }
       };
       let checkAccuracy = (rule, value, callback) => {
-        if (!value) {
+        if (!this.accountInfo) {
+          return callback(new Error('请先登录！'));
+        } else if (!value) {
           return callback(new Error('通证精度不能为空!'));
         } else {
           callback();
@@ -121,14 +131,18 @@
       };
 
       let checkName721 = (rule, value, callback) => {
-        if (!value) {
+        if (!this.accountInfo) {
+          return callback(new Error('请先登录！'));
+        } else if (!value) {
           return callback(new Error('通证名称不能为空!'));
         } else {
           callback();
         }
       };
       let checkSymbol721 = (rule, value, callback) => {
-        if (!value) {
+        if (!this.accountInfo) {
+          return callback(new Error('请先登录！'));
+        } else if (!value) {
           return callback(new Error('通证缩写不能为空!'));
         } else {
           callback();
@@ -140,11 +154,11 @@
         balanceInfo: {},//账户余额信息
         activeName: 'nrc20', //tab 默认选中
         nrc20Form: {
-          contractName: 'nrc20',
-          name20: 'pocmnrc20',
-          symbol20: 'nrc20',
-          circulation: 9999999,
-          accuracy: 9,
+          contractName: '',
+          name20: '',
+          symbol20: '',
+          circulation: '',
+          accuracy: '',
         },
         nrc20Rules: {
           name20: [{validator: checkName20, trigger: 'blur'}],
@@ -158,9 +172,9 @@
         contractCreateTxData: {},//组装创建合约交易
 
         nrc721Form: {
-          contractName: 'nrc721',
-          name721: 'pocmnrc721',
-          symbol721: 'nrc721',
+          contractName: '',
+          name721: '',
+          symbol721: '',
         },
         nrc721Rules: {
           name721: [{validator: checkName721, trigger: 'blur'}],
@@ -169,21 +183,12 @@
       };
     },
     created() {
-      this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
+
     },
     components: {
       Password,
     },
     methods: {
-
-      /**
-       * tab 切换
-       * @param tab
-       * @param event
-       */
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
 
       /**
        * NRC-20合约提交
@@ -192,6 +197,7 @@
       submitNrc20Form(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
             let newArr = Object.values(this.nrc20Form);
             newArr.shift();
             this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC20_HEX, newArr, this.nrc20Form);
@@ -209,6 +215,7 @@
       submitNrc721Form(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
             let newArr = Object.values(this.nrc721Form);
             newArr.shift();
             this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC_721, newArr, this.nrc721Form);
@@ -262,6 +269,7 @@
             console.log(response);
             if (response.success) {
               this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 1000});
+              this.validateCode(this.contractCreateTxData.contractAddress, this.activeName === 'nrc20' ? 1 : 2);
               this.contractCreateTxData = {};
             } else {
               this.$message({message: "合约验证并广播失败", type: 'error', duration: 1000});
@@ -311,7 +319,7 @@
             console.log(response);
             if (response.hasOwnProperty("result")) {
               this.gas = response.result.gasLimit;
-              this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, formData.contractName, formData);
+              this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, formData.contractName);
             } else {
               this.$message({message: "预估创建合约交易的gas错误", type: 'error', duration: 1000});
             }
@@ -330,7 +338,7 @@
        * @param args
        * @param alias
        */
-      async makeCreateData(gasLimit, createAddress, contractCode, args, alias, formData) {
+      async makeCreateData(gasLimit, createAddress, contractCode, args, alias) {
         let contractCreate = {};
         contractCreate.chainId = API_CHAIN_ID;
         contractCreate.sender = createAddress;
@@ -338,9 +346,8 @@
         contractCreate.price = sdk.CONTRACT_MINIMUM_PRICE;
         contractCreate.contractCode = contractCode;
         contractCreate.alias = alias;
-        let newFormData = formData;
-        delete newFormData.contractName;
-        let contractConstructorArgsTypes = this.makeContractConstructorArgsTypes(newFormData);
+        let constructor = await getContractConstructor(contractCode);
+        let contractConstructorArgsTypes = this.makeContractConstructorArgsTypes(constructor);
         if (args.length !== 0) {
           contractCreate.args = await utils.twoDimensionalArray(args, contractConstructorArgsTypes);
         } else {
@@ -377,8 +384,8 @@
        * @param assetId
        * @param address
        **/
-      getBalanceByAddress(chainId, assetId, address) {
-        getBalanceOrNonceByAddress(chainId, assetId, address).then((response) => {
+      async getBalanceByAddress(chainId, assetId, address) {
+        await  getBalanceOrNonceByAddress(chainId, assetId, address).then((response) => {
           //console.log(response);
           if (response.success) {
             this.balanceInfo = response.data;
@@ -391,6 +398,26 @@
         });
       },
 
+      /**
+       * @disc: 认证代码
+       * @params: contratAddress ，type
+       * @date: 2019-08-20 17:51
+       * @author: Wave
+       */
+      validateCode(contratAddress, type) {
+        const url = POCM_API_URL + '/pocm/contract/validate';
+        const data = {contratAddress: contratAddress, type: type};
+        axios.post(url, data)
+          .then((response) => {
+            //console.log(response.data);
+            if (!response.data.success) {
+              console.log("认证代码失败");
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
 
     }
   }

@@ -92,6 +92,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.importAddressInfo = nuls.importByKey(API_CHAIN_ID, this.importForm.keys, this.importForm.pass);
+            //this.getAuthorization(this.importAddressInfo.address);
             this.addressInfoByAddress(this.importAddressInfo.address);
           } else {
             return false;

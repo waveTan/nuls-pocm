@@ -8,22 +8,18 @@
         <el-menu :default-active="activeIndex" class="fl" mode="horizontal" @select="handleSelect">
           <el-menu-item index="projects">选择项目</el-menu-item>
           <el-menu-item index="token">发行通证</el-menu-item>
-          <div class="user click fr tc">
-            <div v-if="!accountAddress">
-              <el-link type="primary" @click="toUrl('newAddress')" v-if="!accountAddress">登陆
-              </el-link>
-            </div>
-            <div class="user_info" v-else>
+          <div class="user fr tc" v-if="accountAddress">
+            <div class="user_info">
               <el-submenu index="user">
                 <template slot="title"><i class="el-icon-s-custom click "></i>&nbsp;
                 </template>
                 <el-menu-item index="userInfo">用户中心</el-menu-item>
-                <el-menu-item index="code">唯一识别码</el-menu-item>
                 <el-menu-item index="signOut">退出</el-menu-item>
               </el-submenu>
             </div>
           </div>
         </el-menu>
+        <div v-if="!accountAddress" class="click font14 fr landing" @click="toUrl('newAddress')">登陆</div>
       </div>
     </div>
     <div class="cb"></div>
@@ -31,6 +27,9 @@
 </template>
 
 <script>
+  import axios from 'axios'
+  import {POCM_API_URL} from '@/config'
+
   export default {
     data() {
       return {
@@ -55,18 +54,15 @@
        * @param key
        * @param keyPath
        */
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-        if(key === 'projects'){
+      handleSelect(key) {
+        if (key === 'projects') {
           this.toUrl('projectsList')
-        }else if(key === 'token'){
+        } else if (key === 'token') {
           this.toUrl('newToken')
-        }else if (key === 'userInfo') {
-          this.toUrl('user')
-        }else if(key === 'signOut') {
+        } else if (key === 'userInfo') {
+          this.getAuthorization(this.accountInfo.address);
+        } else if (key === 'signOut') {
           this.signOut();
-        }else if(key === 'code') {
-          this.toUrl('newPocm')
         }
       },
 
@@ -78,6 +74,38 @@
         this.accountInfo = {};
         this.accountAddress = '';
         this.toUrl('newAddress')
+      },
+
+      /**
+       * @disc: 判断地址是否为创建项目者
+       * @params: address
+       * @date: 2019-08-26 16:58
+       * @author: Wave
+       */
+      async getAuthorization(address) {
+        const url = POCM_API_URL + '/pocm/authorization/list';
+        const data = {address: address};
+        await axios.post(url, data)
+          .then((response) => {
+            //console.log(response.data);
+            if (response.data.success && response.data.data.length !== 0) {
+              if (response.data.data.length === 0) {
+                this.toUrl('user')
+              } else {
+                this.$router.push({
+                  name: 'newPocm',
+                  query: {authorizationCode: response.data.data[0].authorizationCode, name: response.data.data[0].name}
+                })
+              }
+            } else {
+              this.toUrl('user');
+              this.$message({message: "对不起，获取项目发布者错误！", type: 'error', duration: 3000});
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            this.$message({message: "对不起，获取项目发布者异常！", type: 'error', duration: 3000});
+          })
       },
 
       /**
@@ -95,8 +123,9 @@
 
 <style lang="less">
   @import "./../assets/css/style";
+
   .header {
-    border-bottom: 2px solid  #4ef16a;
+    border-bottom: 2px solid #4ef16a;
     //border-bottom-color: linear-gradient(to right, #4ef16a, #0ede94);
     height: 81px;
     line-height: 81px;
@@ -126,8 +155,6 @@
         }
       }
       .user {
-        width: 100px;
-        line-height: 80px;
         .user_info {
           .el-submenu {
             &:hover {
@@ -145,6 +172,13 @@
             }
           }
         }
+      }
+      .landing {
+        width: 30px;
+        margin-top: 35px;
+        text-align: center;
+        z-index: 99;
+        position: relative;
       }
     }
   }
