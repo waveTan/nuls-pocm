@@ -128,7 +128,7 @@
         },
         contractCallData: [],
         entrustForm: {
-          number: 2000
+          number: ''
         },
         entrustRules: {
           number: [

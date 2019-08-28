@@ -2,7 +2,7 @@
   <div class="projects_list bg-white">
     <div class="w1200 projects_title">
       <h5 class="info fl">下方为当前已经启动的POCM项目，请选择合适的项目进行投资</h5>
-      <el-button round class="btn fr">选择项目</el-button>
+      <el-button round class="btn fr" @click="toUrl('projectsLaunch','',0)">发行项目</el-button>
     </div>
     <div class="cb"></div>
     <div class=" w1200 projects_info bg-white">
@@ -45,12 +45,11 @@
         const data = {status: 1};
         axios.post(url, data)
           .then((response) => {
-            console.log(response.data.data);
+            //console.log(response.data.data);
             if (response.data.success) {
               for (let itme of response.data.data) {
                 itme.totalDeposit = divisionDecimals(itme.totalDeposit);
               }
-
               this.projectsList = [...response.data.data];
             }
           })

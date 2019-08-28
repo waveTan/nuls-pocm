@@ -154,11 +154,11 @@
         balanceInfo: {},//账户余额信息
         activeName: 'nrc20', //tab 默认选中
         nrc20Form: {
-          contractName: 'wavepocm',
-          name20: 'wavepocm',
-          symbol20: 'wavepocm',
-          circulation: 987654321,
-          accuracy: 9,
+          contractName: '',
+          name20: '',
+          symbol20: '',
+          circulation: '',
+          accuracy: '',
         },
         nrc20Rules: {
           name20: [{validator: checkName20, trigger: 'blur'}],

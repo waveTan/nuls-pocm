@@ -87,7 +87,7 @@
         const data = {address: address};
         await axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
               if (response.data.data.length === 0) {
                 this.toUrl('user')

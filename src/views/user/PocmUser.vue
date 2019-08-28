@@ -1,5 +1,5 @@
 <template>
-  <div class="pocm_user">
+  <div class="pocm_user" v-loading="pocomUserLoading">
     <div class="pocm_user_top">
       <div class="w1200">
         <div class="left fl">
@@ -26,7 +26,7 @@
       <ul class="list">
         <li class="shadow fl" v-for="(item,index) in myNodeList" :key="index">
           <h5>
-            {{item.agentAlias ? item.agentAlias:item.agentId}}
+            {{item.agentId}}
             <span class="fr"><i class="el-icon-apple"></i>{{item.status === 0 ? '待共识':'共识中'}}</span>
           </h5>
           <p>总收益: {{item.totalReward}} <span class="fr">保证金: {{item.deposit}}</span></p>
@@ -74,10 +74,16 @@
           return callback(new Error('请输入正确的节点ID'));
         }
         let isAllNodeList = await this.verificationID(value);
-        if (isAllNodeList.length === 0) {
-          callback(new Error('请输入正确的节点ID'));
+        if (!isAllNodeList.success) {
+          if (isAllNodeList.code === 100) {
+            callback(new Error('节点ID已经存在'));
+          } else if (isAllNodeList.code === 200) {
+            callback(new Error('请输入正确的节点ID'));
+          } else {
+            callback();
+          }
         } else {
-          this.addNodeInfo = isAllNodeList;
+          this.addNodeInfo = isAllNodeList.data;
           callback();
         }
       };
@@ -91,7 +97,7 @@
 
         addNodeDialog: false, //添加节点弹框
         addForm: {
-          values: '8ACFFAAB'
+          values: ''
         },
         addRules: {
           values: [
@@ -102,16 +108,20 @@
         gas: 1,
         price: 25,
         contractCallData: [], //调用合约data
+        pocomUserLoading: true, //加载动画
       };
     },
     created() {
       this.getConsensusNodes(1, 500, 0);
-      //this.selectDataByStatus(this.releaseId);
-      console.log(this.data);
-      for (let ks in this.data.agentHashList) {
-        console.log(ks);
-        //this.myNodeList.push(this.this.data.filter(item => item.txHash === ks))
-      }
+    },
+    mounted() {
+      setTimeout(() => {
+        for (let ks of this.data.agentHashList) {
+          let newList = this.allNodeList.filter(item => item.txHash === ks);
+          this.myNodeList.push(newList[0]);
+          this.pocomUserLoading = false;
+        }
+      }, 500);
     },
     components: {
       Password,
@@ -163,7 +173,17 @@
        * @author: Wave
        */
       verificationID(agentId) {
-        return this.allNodeList.filter(item => item.agentId === agentId.toLowerCase());
+        let newMyList = this.myNodeList.filter(item => item.agentId === agentId.toLowerCase());
+        if (newMyList.length === 0) {
+          let newAllList = this.allNodeList.filter(item => item.agentId === agentId.toLowerCase());
+          if (newAllList.length !== 0) {
+            return {success: true, data: newAllList[0]};
+          } else {
+            return {success: false, code: 200};
+          }
+        } else {
+          return {success: false, code: 100};
+        }
       },
 
       /**
@@ -176,7 +196,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
-            this.validateContractCall(this.accountInfo.address, 0, 10000000, 25, this.data.contractAddress, 'addOtherAgent', '', [this.addNodeInfo[0].txHash]);
+            this.validateContractCall(this.accountInfo.address, 0, 10000000, 25, this.data.contractAddress, 'addOtherAgent', '', [this.addNodeInfo.txHash]);
           } else {
             return false;
           }
@@ -250,6 +270,7 @@
             //console.log(response);
             if (response.success) {
               this.$message({message: "交易已经发出，区块确定需要一定的时间，你可以在浏览器上查询交易是否已确定", type: 'success', duration: 2000});
+              this.$refs['addForm'].resetFields();
             } else {
               this.$message({message: "广播交易失败", type: 'error', duration: 3000});
             }

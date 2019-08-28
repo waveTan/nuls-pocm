@@ -57,7 +57,7 @@
 <script>
   import axios from 'axios'
   import {POCM_API_URL} from '@/config'
-  import {connect} from '@/api/util'
+  import {connect, divisionDecimals} from '@/api/util'
 
   export default {
     data() {
@@ -81,6 +81,9 @@
         await axios.post(url, data)
           .then((response) => {
             if (response.data.success) {
+              for (let itme of response.data.data) {
+                itme.totalDeposit = divisionDecimals(itme.totalDeposit);
+              }
               this.projectsList = [...response.data.data];
             }
           })
