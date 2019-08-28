@@ -87,15 +87,25 @@
         const data = {address: address};
         await axios.post(url, data)
           .then((response) => {
-            //console.log(response.data);
-            if (response.data.success && response.data.data.length !== 0) {
+            console.log(response.data);
+            if (response.data.success) {
               if (response.data.data.length === 0) {
                 this.toUrl('user')
               } else {
-                this.$router.push({
-                  name: 'newPocm',
-                  query: {authorizationCode: response.data.data[0].authorizationCode, name: response.data.data[0].name}
-                })
+                if (response.data.data[0].status === 0) {
+                  this.$router.push({
+                    name: 'newPocm',
+                    query: {
+                      authorizationCode: response.data.data[0].authorizationCode,
+                      name: response.data.data[0].name
+                    }
+                  })
+                } else {
+                  this.$router.push({
+                    name: 'pocmUser',
+                  });
+                  sessionStorage.setItem("data", JSON.stringify(response.data.data[0]))
+                }
               }
             } else {
               this.toUrl('user');

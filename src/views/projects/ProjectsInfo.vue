@@ -65,7 +65,7 @@
               <el-button class="btn" @click="submitForm('entrustForm')">参与委托</el-button>
             </el-form-item>
           </el-form>
-          <div class="tc">
+          <div class="tc" v-show="!accountInfo.address">
             <el-button class="i_bt" @click="toUrl('importAddress','',0)">导入账户</el-button>
             <el-button class="n_bt" @click="toUrl('newAddress','',0)">创建账户</el-button>
           </div>
@@ -120,16 +120,11 @@
       return {
         accountInfo: localStorage.hasOwnProperty('accountInfo') ? JSON.parse(localStorage.getItem('accountInfo')) : {balance: 0},//账户信息
         balanceInfo: {},//账户余额信息
-        releaseId: this.$route.query.releaseId,//项目ID
+        releaseId: Number(this.$route.query.releaseId),//项目ID
         projectsInfo: {},//项目信息
         chartData: {
           columns: ['allocation', 'percent'],
-          rows: [
-            {allocation: '基金会', percent: 10},
-            {allocation: '战略合作', percent: 20},
-            {allocation: '游戏合作', percent: 50},
-            {allocation: '团队', percent: 20},
-          ]
+          rows: []
         },
         contractCallData: [],
         entrustForm: {
@@ -143,6 +138,7 @@
       };
     },
     created() {
+      console.log(this.releaseId);
       this.selectDataByStatus(this.releaseId);
     },
     components: {
@@ -160,11 +156,12 @@
         const url = POCM_API_URL + '/pocm/release/' + releaseId;
         await axios.get(url)
           .then((response) => {
-            //console.log(response.data);
+            console.log(response.data);
             if (response.data.success) {
               response.data.data.minimumDeposit = divisionDecimals(response.data.data.minimumDeposit);
               response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
+              this.chartData.rows = [...response.data.data.tokenAllocationList]
             }
           })
           .catch((error) => {

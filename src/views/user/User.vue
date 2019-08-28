@@ -101,7 +101,7 @@
         selectOptions: [],//下拉框列表
         selectValue: -1,//下拉框选中
         projectList: [],//我的项目列表
-        contractCallData: [],
+        contractCallData: [], //调用合约data
         pageIndex: 1, //页码
         pageSize: 10, //每页条数
         pageTotal: 0,//总页数
@@ -203,6 +203,7 @@
             if (response.data.success) {
               if (response.data.data) {
                 for (let item of response.data.data) {
+                  item.depositAmount = divisionDecimals(item.depositAmount);
                   item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
                 }
                 this.projectList = [...response.data.data];

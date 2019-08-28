@@ -3,7 +3,6 @@
     <div class="token_bg">
       <div class="bg-white shadow w1200 token_form">
         <h3 class="tc">请根据实际业务配置Token分发机制并发布合约</h3>
-
         <el-form :model="pocmForm" status-icon :rules="pocmRules" ref="pocmForm" class="launch_form w630">
           <div class="font14 mb_20 ">唯一识别码: {{authorizationCode}}</div>
           <el-form-item label="Token合约地址" prop="tokenAddress">
@@ -112,7 +111,7 @@
         balanceInfo: {},//账户余额信息
         authorizationCode: this.$route.query.authorizationCode,//项目ID
         pocmForm: {
-          tokenAddress: 'tNULSeBaMxkrbYNNFUxTEFYa2EoBg7SZWagK33',
+          tokenAddress: 'tNULSeBaN5ZKRzrvU6616UKWakCUzDdsN7BJy9',
           awardingCycle: '10',
           cycleRewardTokenAmount: '20',
           minimumLocked: '30',
@@ -147,7 +146,7 @@
       async getContractInfoByContractAddress(contractAddress) {
         return await this.$post('/', 'getContract', [contractAddress])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result") && response.result.nrc20) {
               return true
             } else {
@@ -172,7 +171,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
-            let newArr = [this.pocmForm.tokenAddress, this.pocmForm.cycleRewardTokenAmount, this.pocmForm.awardingCycle, this.pocmForm.minimumDepositNULS, this.pocmForm.minimumLocked, false, this.authorizationCode, null, null];
+            let newArr = [this.pocmForm.tokenAddress, this.pocmForm.cycleRewardTokenAmount, this.pocmForm.awardingCycle, this.pocmForm.minimumDepositNULS, this.pocmForm.minimumLocked, true, this.authorizationCode, null, null];
             this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, POCM, newArr);
             this.$refs.password.showPassword(true);
           } else {
@@ -199,7 +198,7 @@
           };
           let pub = this.accountInfo.pub;
           let remark = '';
-          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, false);
           //console.log(inOrOutputs);
           if (!inOrOutputs.success) {
             this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
@@ -212,7 +211,7 @@
           //手续费大于0.001的时候重新组装交易及签名
           if (transferInfo.fee !== newFee) {
             transferInfo.fee = newFee;
-            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, false);
             tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 15, this.contractCreateTxData);
             txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
           } else {

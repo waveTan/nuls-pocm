@@ -154,11 +154,11 @@
         balanceInfo: {},//账户余额信息
         activeName: 'nrc20', //tab 默认选中
         nrc20Form: {
-          contractName: '',
-          name20: '',
-          symbol20: '',
-          circulation: '',
-          accuracy: '',
+          contractName: 'wavepocm',
+          name20: 'wavepocm',
+          symbol20: 'wavepocm',
+          circulation: 987654321,
+          accuracy: 9,
         },
         nrc20Rules: {
           name20: [{validator: checkName20, trigger: 'blur'}],
@@ -244,7 +244,7 @@
           };
           let pub = this.accountInfo.pub;
           let remark = '';
-          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, true);
           console.log(inOrOutputs);
           if (!inOrOutputs.success) {
             this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
@@ -257,7 +257,7 @@
           //手续费大于0.001的时候重新组装交易及签名
           if (transferInfo.fee !== newFee) {
             transferInfo.fee = newFee;
-            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, true);
             tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 15, this.contractCreateTxData);
             txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
           } else {
@@ -409,7 +409,7 @@
         const data = {contratAddress: contratAddress, type: type};
         axios.post(url, data)
           .then((response) => {
-            //console.log(response.data);
+            console.log(response.data);
             if (!response.data.success) {
               console.log("认证代码失败");
             }

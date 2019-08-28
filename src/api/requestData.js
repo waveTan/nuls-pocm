@@ -30,9 +30,10 @@ export function countCtxFee(tx, signatrueCount) {
  * @param transferInfo
  * @param balanceInfo
  * @param type
+ * @param is10NULS 是否收取10个 nuls 手续费 true false
  * @returns {*}
  **/
-export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
+export async function inputsOrOutputs(transferInfo, balanceInfo, type,is10NULS) {
   let newAmount = Number(Plus(transferInfo.amount, transferInfo.fee));
   let newLocked = 0;
   let newNonce = balanceInfo.nonce;
@@ -87,15 +88,17 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
   }
   let outputs = [];
   if (type === 15) {
-    // 部署合约收取10nuls 手续费
-    inputs[0].amount = 10 * 100000000;
-    outputs = [{
-      address: nuls.getAddressByPub(API_CHAIN_ID, 1, API_BURNING_ADDRESS_PUB, API_PREFIX),
-      assetsChainId: API_CHAIN_ID,
-      assetsId: 1,
-      amount: Number(Minus(inputs[0].amount, newAmount)),
-      lockTime: newLockTime
-    }];
+    // 部署nrc-20 nrc-721合约收取10nuls 手续费
+    if(is10NULS){
+      inputs[0].amount = 10 * 100000000;
+      outputs = [{
+        address: nuls.getAddressByPub(API_CHAIN_ID, 1, API_BURNING_ADDRESS_PUB, API_PREFIX),
+        assetsChainId: API_CHAIN_ID,
+        assetsId: 1,
+        amount: Number(Minus(inputs[0].amount, newAmount)),
+        lockTime: newLockTime
+      }];
+    }
     return {success: true, data: {inputs: inputs, outputs: outputs}};
   }
   if (type === 16) {

@@ -196,22 +196,26 @@
 
       return {
         launchForm: {
-          name: '',
-          email: '',
-          tokenTotalSupply: '',
-          tokenInitialCirculatingPercent: '',
-          tokenMiningPercent: '',
-          tokenName: '',
-          tokenSymbol: '',
-          website: '',
-          projectCard: '',
-          introduction: '',
-          mainFunctionPoints: '',
-          tokenAllocationList: [{
-            allocation: '',
-            percent: '',
-            key: Date.now()
-          }]
+          name: 'wave_pocm',
+          email: 'wave@qq.com',
+          tokenTotalSupply: '987654321',
+          tokenInitialCirculatingPercent: '10',
+          tokenMiningPercent: '20',
+          tokenName: 'wavepocm',
+          tokenSymbol: 'wavepocm',
+          website: 'http://www.wave.com',
+          projectCard: 'wave_pocm wave_pocm',
+          introduction: 'wave_pocm wave_pocm wave_pocm',
+          mainFunctionPoints: 'wave_pocm wave_pocm wave_pocm wave_pocm',
+          tokenAllocationList: [
+            {allocation: '111', percent: '10', key: Date.now()},
+            {allocation: '222', percent: '15', key: Date.now()},
+            {allocation: '333', percent: '20', key: Date.now()},
+            {allocation: '444', percent: '25', key: Date.now()},
+            {allocation: '555', percent: '30', key: Date.now()},
+            {allocation: '666', percent: '5', key: Date.now()},
+            {allocation: '777', percent: '5', key: Date.now()},
+            ]
         },
         launchRules: {
           name: [{validator: checkName, trigger: 'blur'}],

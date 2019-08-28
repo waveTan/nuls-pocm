@@ -215,7 +215,7 @@ export function connect(name, parameter, type) {
     }
     return {success: true, data: newPush};
   } else {
-    connect(name);
-    return {success: true, data: {}};
+    window.open(name,'_blank');
+    return {success: false};
   }
 }
