@@ -10,11 +10,11 @@
         <div class="right fl">
           <h4>
             <span>总收益</span>
-            <span>22222.2222<font class="fCN"> NULS</font></span>
+            <span>{{data.totalDeposit}}<font class="fCN"> NULS</font></span>
           </h4>
           <h4>
             <span>获得抵押</span>
-            <span>22222.2222<font class="fCN"> NULS</font></span>
+            <span>{{data.projectConsensusRewards}}<font class="fCN"> NULS</font></span>
           </h4>
         </div>
       </div>
@@ -54,9 +54,10 @@
 </template>
 
 <script>
+  import axios from 'axios'
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
-  import {API_CHAIN_ID} from '@/config'
+  import {API_CHAIN_ID, POCM_API_URL} from '@/config'
   import {
     divisionDecimals,
     Times,
@@ -109,24 +110,72 @@
         price: 25,
         contractCallData: [], //调用合约data
         pocomUserLoading: true, //加载动画
+        pocmUserSetInterval: null,//定时器
       };
     },
     created() {
       this.getConsensusNodes(1, 500, 0);
     },
     mounted() {
+      let address = '';
       setTimeout(() => {
-        for (let ks of this.data.agentHashList) {
-          let newList = this.allNodeList.filter(item => item.txHash === ks);
-          this.myNodeList.push(newList[0]);
+        address = this.accountInfo.address;
+        if (this.data.agentHashList) {
+          for (let ks of this.data.agentHashList) {
+            let newList = this.allNodeList.filter(item => item.txHash === ks);
+            this.myNodeList.push(newList[0]);
+            this.pocomUserLoading = false;
+          }
+        } else {
           this.pocomUserLoading = false;
         }
       }, 500);
+
+      this.pocmUserSetInterval = setInterval(() => {
+        this.getAuthorization(address);
+      }, 5000)
     },
     components: {
       Password,
     },
+    destroyed() {
+      clearInterval(this.pocmUserSetInterval);
+    },
     methods: {
+
+      /**
+       * @disc: 判断地址是否为创建项目者
+       * @params: address
+       * @date: 2019-08-26 16:58
+       * @author: Wave
+       */
+      async getAuthorization(address) {
+        const url = POCM_API_URL + '/pocm/authorization/list';
+        const data = {address: address};
+        await axios.post(url, data)
+          .then((response) => {
+            //console.log(response.data);
+            if (response.data.success) {
+              if (response.data.data.length !== 0 && response.data.data[0].status === 1) {
+                let newAgentHashList = response.data.data[0].agentHashList;
+                if (newAgentHashList) {
+                  let newList = [];
+                  for (let ks of newAgentHashList) {
+                    newList.push(this.allNodeList.filter(item => item.txHash === ks)[0]);
+                  }
+                  if (this.myNodeList.length !== newList.length) {
+                    this.myNodeList = [];
+                    this.myNodeList = [...newList];
+                    sessionStorage.setItem("data", JSON.stringify(response.data.data[0]));
+                  }
+                }
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      },
 
       /**
        * @disc: 所有共识列表信息
@@ -271,6 +320,7 @@
             if (response.success) {
               this.$message({message: "交易已经发出，区块确定需要一定的时间，你可以在浏览器上查询交易是否已确定", type: 'success', duration: 2000});
               this.$refs['addForm'].resetFields();
+              this.addNodeDialog = false;
             } else {
               this.$message({message: "广播交易失败", type: 'error', duration: 3000});
             }

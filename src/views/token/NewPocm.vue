@@ -111,11 +111,11 @@
         balanceInfo: {},//账户余额信息
         authorizationCode: this.$route.query.authorizationCode,//项目ID
         pocmForm: {
-          tokenAddress: 'tNULSeBaN5ZKRzrvU6616UKWakCUzDdsN7BJy9',
-          awardingCycle: '10',
-          cycleRewardTokenAmount: '20',
-          minimumLocked: '30',
-          minimumDepositNULS: '40',
+          tokenAddress: '',
+          awardingCycle: '',
+          cycleRewardTokenAmount: '',
+          minimumLocked: '',
+          minimumDepositNULS: '',
         },
         pocmRules: {
           tokenAddress: [{validator: checkTokenAddress, trigger: 'blur'}],

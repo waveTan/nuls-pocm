@@ -106,12 +106,22 @@
         pageSize: 10, //每页条数
         pageTotal: 0,//总页数
         passportList: [],//我的通证列表
+        userSetInterval: null,//定时器
       }
     },
     created() {
       this.addressInfoByAddress(this.accountInfo.address);
       this.selectDataByStatus();
-      this.projectListById(this.selectValue);
+      this.getProjectList(this.selectValue,this.accountInfo.address);
+    },
+    mounted() {
+      this.userSetInterval = setInterval(() => {
+        this.selectDataByStatus();
+        this.getProjectList(this.selectValue,this.accountInfo.address);
+      }, 10000)
+    },
+    destroyed() {
+      clearInterval(this.userSetInterval);
     },
     components: {
       Password,
@@ -128,6 +138,9 @@
       handleClick(tab) {
         if (tab.name === 'myPassport') {
           this.getMyTokenListByAddress(this.accountInfo.address);
+        }else {
+          this.selectDataByStatus();
+          this.getProjectList(this.selectValue,this.accountInfo.address);
         }
       },
 
@@ -139,7 +152,7 @@
        */
       selectChange(val) {
         this.selectValue = val;
-        this.projectListById(this.selectValue);
+        this.getProjectList(this.selectValue,this.accountInfo.address);
       },
 
       /**
@@ -189,14 +202,14 @@
       },
 
       /**
-       * @disc: 获取挖矿信息列表根据项目ID
-       * @params:Id
+       * @disc: 我的项目列表根据项目ID和地址
+       * @params:Id,address
        * @date: 2019-08-20 17:51
        * @author: Wave
        */
-      projectListById(Id) {
+      getProjectList(Id, address) {
         const url = POCM_API_URL + '/pocm/mining/list';
-        const data = {releaseId: Id};
+        const data = {releaseId: Id, depositAddress: address};
         axios.post(url, data)
           .then((response) => {
             //console.log(response.data);
@@ -204,8 +217,11 @@
               if (response.data.data) {
                 for (let item of response.data.data) {
                   item.depositAmount = divisionDecimals(item.depositAmount);
+                  item.receivedMiningAmount = divisionDecimals(item.receivedMiningAmount,item.tokenDecimals);
+                  item.unreceivedMiningAmount = divisionDecimals(item.unreceivedMiningAmount,item.tokenDecimals);
                   item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
                 }
+                this.projectList =[];
                 this.projectList = [...response.data.data];
               }
             }
@@ -259,9 +275,10 @@
        * @author: Wave
        */
       append(rowInfo) {
+        //console.log(rowInfo);
         this.$router.push({
           name: 'projectsInfo',
-          query: {releaseId: rowInfo.id}
+          query: {releaseId: rowInfo.releaseId}
         });
       },
 

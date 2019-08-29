@@ -45,7 +45,7 @@
         const data = {status: 1};
         axios.post(url, data)
           .then((response) => {
-            //console.log(response.data.data);
+            console.log(response.data);
             if (response.data.success) {
               for (let itme of response.data.data) {
                 itme.totalDeposit = divisionDecimals(itme.totalDeposit);

@@ -154,7 +154,7 @@
         balanceInfo: {},//账户余额信息
         activeName: 'nrc20', //tab 默认选中
         nrc20Form: {
-          contractName: '',
+          contractName: 'nrc_20',
           name20: '',
           symbol20: '',
           circulation: '',
@@ -172,7 +172,7 @@
         contractCreateTxData: {},//组装创建合约交易
 
         nrc721Form: {
-          contractName: '',
+          contractName: 'nrc_721',
           name721: '',
           symbol721: '',
         },
