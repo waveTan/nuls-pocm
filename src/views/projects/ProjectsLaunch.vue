@@ -78,12 +78,9 @@
   export default {
     data() {
       let checkName = (rule, value, callback) => {
-        let regular = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
         if (!value) {
           return callback(new Error('请输入您的项目名称'));
-        } else if (!regular.exec(value)) {
-          return callback(new Error('请输入项目名称(只允许使用小写字母、数字、下划线（下划线不能在两端）)'));
-        } else if (2 > stringLength(value) || 16 < stringLength(value)) {
+        } else if (2 > stringLength(value) || 50 < stringLength(value)) {
           return callback(new Error('项目名称长度为2-16'));
         } else {
           callback();
@@ -110,21 +107,21 @@
         }
       };
       let checkTokenInitialCirculatingPercent = (rule, value, callback) => {
-        let regular = /^(?:[1-9]?\d|100)$/;
+        let regular =  /^(([1-9][0-9]|[1-9])(\.\d{1,2})?|0\.\d{1,2}|100)$/;
         if (!value) {
           return callback(new Error('请输入初始流通比例'));
         } else if (!regular.exec(value)) {
-          return callback(new Error('请输入正确初始流通比例0-100整数'));
+          return callback(new Error('请输入正确初始流通比例0-100两位有效数值'));
         } else {
           callback();
         }
       };
       let checkTokenMiningPercent = (rule, value, callback) => {
-        let regular = /^(?:[1-9]?\d|100)$/;
+        let regular =  /^(([1-9][0-9]|[1-9])(\.\d{1,2})?|0\.\d{1,2}|100)$/;
         if (!value) {
           return callback(new Error('请输入POCM发行比例'));
         } else if (!regular.exec(value)) {
-          return callback(new Error('请输入正确POCM发行比例0-100整数'));
+          return callback(new Error('请输入正确POCM发行比例0-100两位有效数值'));
         } else {
           callback();
         }
@@ -154,7 +151,7 @@
         }
       };
       let checkWebsite = (rule, value, callback) => {
-        let regular = /^((ht|f)tps?):\/\/([\\w\\-]+(\.[\\w\\-]+)*\/)*[\\w\\-]+(\.[\\w\\-]+)*\/?(\?([\\w\\-\\.,@?^=%&:\\/~\\+#]*)+)?/;
+        let regular = /(http|https):\/\/([\w.]+\/?)\S*/;
         if (!value) {
           return callback(new Error('请输入官网地址'));
         } else if (!regular.exec(value)) {
@@ -169,7 +166,7 @@
           return callback(new Error('请输入项目介绍'));
         } else if (!regular.exec(value)) {
           return callback(new Error('请输入正确项目介绍只允许英文'));
-        } else if (2 > stringLength(value) || 50 < stringLength(value)) {
+        } else if (2 > stringLength(value) || 150 < stringLength(value)) {
           return callback(new Error('请输入正确项目介绍长度为2-50'));
         } else {
           callback();
@@ -178,7 +175,7 @@
       let checkIntroduction = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请输入项目说明'));
-        } else if (8 > stringLength(value) || 200 < stringLength(value)) {
+        } else if (8 > stringLength(value) || 600 < stringLength(value)) {
           return callback(new Error('请输入正确项目说明长度为8-200'));
         } else {
           callback();
@@ -187,7 +184,7 @@
       let checkMainFunctionPoints = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请输入项目主要功能点'));
-        } else if (8 > stringLength(value) || 200 < stringLength(value)) {
+        } else if (8 > stringLength(value) || 600 < stringLength(value)) {
           return callback(new Error('请输入正确项目主要功能点长度为8-200'));
         } else {
           callback();

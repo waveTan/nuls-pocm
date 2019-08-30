@@ -87,7 +87,7 @@
         const data = {address: address};
         await axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
               if (response.data.data.length === 0) {
                 this.toUrl('user')
@@ -136,27 +136,32 @@
 
   .header {
     border-bottom: 2px solid #4ef16a;
-    //border-bottom-color: linear-gradient(to right, #4ef16a, #0ede94);
-    height: 81px;
-    line-height: 81px;
+    height: 100px;
+    line-height: 100px;
     .logo {
-      width: 150px;
+      width: 104px;
       margin: 18px 0 0 0;
-      height: 62px;
+      height: 42px;
     }
     .nav {
-      width: 1050px;
-      height: 79px;
+      width: 1095px;
+      height: 98px;
       .el-menu.el-menu--horizontal {
         border-bottom: 0;
-        width: 950px;
-        height: 79px;
+        width: 1095px;
+        height: 98px;
         .el-menu-item {
-          height: 79px;
-          line-height: 80px;
-          font-size: 16px;
+          height: 98px;
+          line-height: 100px;
+          padding: 0;
+          margin: 0 25px;
+          font-size: 18px;
+          color: #333;
           &:hover {
             color: @Ncolour;
+          }
+          &:first-child{
+            margin-left: 75px;
           }
         }
         .is-active {
@@ -173,9 +178,12 @@
             .el-submenu__title {
               line-height: 20px;
               height: 20px;
-              margin: 25px auto 0;
+              margin: 40px auto 0;
               padding: 0;
               width: 25px;
+              &:hover{
+                background-color: transparent;
+              }
               .el-icon-arrow-down {
                 font-size: 0;
               }
@@ -185,7 +193,7 @@
       }
       .landing {
         width: 30px;
-        margin-top: 35px;
+        margin: -55px 120px 0 0;
         text-align: center;
         z-index: 99;
         position: relative;

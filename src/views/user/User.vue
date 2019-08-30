@@ -14,17 +14,23 @@
             </el-select>
           </div>
           <el-table :data="projectList" :stripe="true" class="tables">
-            <el-table-column prop="name" label="项目名称" width="180">
+            <el-table-column prop="name" label="项目名称" width="180" align="center">
             </el-table-column>
-            <el-table-column prop="createTime" label="时间" width="180">
+            <el-table-column prop="createTime" label="时间" width="180" align="center">
             </el-table-column>
-            <el-table-column prop="depositAmount" label="已抵押NULS" width="200">
+            <el-table-column prop="depositAmount" label="已抵押(NULS)" width="200" align="center">
             </el-table-column>
-            <el-table-column prop="receivedMiningAmount" label="已获得收益" width="200">
+            <el-table-column prop="receivedMiningAmount" label="已获得收益" width="200" align="center">
+              <template slot-scope="scope">
+                {{scope.row.receivedMiningAmount}} {{scope.row.tokenSymbol}}
+              </template>
             </el-table-column>
-            <el-table-column prop="unreceivedMiningAmount" label="未领取收益" width="200">
+            <el-table-column prop="unreceivedMiningAmount" label="未领取收益" width="200" align="center">
+              <template slot-scope="scope">
+                {{scope.row.unreceivedMiningAmount}} {{scope.row.tokenSymbol}}
+              </template>
             </el-table-column>
-            <el-table-column label="操作" min-width="180">
+            <el-table-column label="操作" min-width="180" align="center">
               <template slot-scope="scope">
                 <span class="click" @click="reward(scope.row)">领取奖励</span>
                 <font style="padding: 0 10px">|</font>
@@ -37,26 +43,26 @@
         </el-tab-pane>
         <el-tab-pane label="我的通证" name="myPassport">
           <el-table :data="passportList" :stripe="true" class="tables">
-            <el-table-column prop="tokenType" label="通证类型" width="150">
+            <el-table-column prop="tokenType" label="通证类型" width="150" align="center">
               <template slot-scope="scope">
                 <span v-if="scope.row.tokenType === 1">NRC20</span>
                 <span v-else-if="scope.row.tokenType === 2">NRC721</span>
                 <span v-else>非token</span>
               </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="180">
+            <el-table-column prop="createTime" label="创建时间" width="180" align="center">
             </el-table-column>
-            <el-table-column prop="tokenName" label="通证名称" width="150">
+            <el-table-column prop="tokenName" label="通证名称" width="150" align="center">
             </el-table-column>
-            <el-table-column prop="contractAddress" label="合约地址" min-width="330">
+            <el-table-column prop="contractAddress" label="合约地址" min-width="330" align="center">
             </el-table-column>
-            <el-table-column prop="status" label="状态" width="150">
+            <el-table-column prop="status" label="状态" width="150" align="center">
               <template slot-scope="scope">
                 <span v-if="scope.row.status === 0 ">未认证</span>
                 <span v-else>已经认证</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" min-width="100">
+            <el-table-column label="操作" min-width="100" align="center">
               <template slot-scope="scope">
                 <span class="click" @click="handleClick(scope.row)">详情</span>
               </template>
@@ -112,12 +118,12 @@
     created() {
       this.addressInfoByAddress(this.accountInfo.address);
       this.selectDataByStatus();
-      this.getProjectList(this.selectValue,this.accountInfo.address);
+      this.getProjectList(this.selectValue, this.accountInfo.address);
     },
     mounted() {
       this.userSetInterval = setInterval(() => {
         this.selectDataByStatus();
-        this.getProjectList(this.selectValue,this.accountInfo.address);
+        this.getProjectList(this.selectValue, this.accountInfo.address);
       }, 10000)
     },
     destroyed() {
@@ -138,9 +144,9 @@
       handleClick(tab) {
         if (tab.name === 'myPassport') {
           this.getMyTokenListByAddress(this.accountInfo.address);
-        }else {
+        } else {
           this.selectDataByStatus();
-          this.getProjectList(this.selectValue,this.accountInfo.address);
+          this.getProjectList(this.selectValue, this.accountInfo.address);
         }
       },
 
@@ -152,7 +158,7 @@
        */
       selectChange(val) {
         this.selectValue = val;
-        this.getProjectList(this.selectValue,this.accountInfo.address);
+        this.getProjectList(this.selectValue, this.accountInfo.address);
       },
 
       /**
@@ -212,16 +218,16 @@
         const data = {releaseId: Id, depositAddress: address};
         axios.post(url, data)
           .then((response) => {
-            //console.log(response.data);
+            console.log(response.data);
             if (response.data.success) {
               if (response.data.data) {
                 for (let item of response.data.data) {
                   item.depositAmount = divisionDecimals(item.depositAmount);
-                  item.receivedMiningAmount = divisionDecimals(item.receivedMiningAmount,item.tokenDecimals);
-                  item.unreceivedMiningAmount = divisionDecimals(item.unreceivedMiningAmount,item.tokenDecimals);
+                  item.receivedMiningAmount = divisionDecimals(item.receivedMiningAmount, item.tokenDecimals);
+                  item.unreceivedMiningAmount = divisionDecimals(item.unreceivedMiningAmount, item.tokenDecimals);
                   item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
                 }
-                this.projectList =[];
+                this.projectList = [];
                 this.projectList = [...response.data.data];
               }
             }
@@ -262,10 +268,10 @@
        * @author: Wave
        */
       reward(rowInfo) {
-        /* console.log(rowInfo);
-         console.log("领取奖励 方法名:receiveAwards 参数：无");*/
+        console.log(rowInfo);
+        console.log("领取奖励 方法名:receiveAwards 参数：无");
         this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
-        this.validateContractCall(this.accountInfo.address, 0, 10000000, 25, rowInfo.contractAddress, 'receiveAwards', '', []);
+        this.validateContractCall(this.accountInfo.address, 0, 10000000, 25, rowInfo.contractAddress, 'receiveAwards', '', [rowInfo.depositNumber]);
       },
 
       /**

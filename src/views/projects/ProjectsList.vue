@@ -41,7 +41,7 @@
        * @author: Wave
        */
       selectDataByStatus() {
-        const url = POCM_API_URL +'/pocm/release/list';
+        const url = POCM_API_URL + '/pocm/release/list';
         const data = {status: 1};
         axios.post(url, data)
           .then((response) => {
@@ -65,7 +65,7 @@
        * @date: 2019-08-20 18:01
        * @author: Wave
        */
-      toUrl(name,params) {
+      toUrl(name, params) {
         this.$router.push({
           name: name,
           query: {releaseId: params}
@@ -90,19 +90,9 @@
       }
     }
     .projects_info {
-      margin: 20px auto 0;
+      margin: 50px auto 0;
       .p_list {
-        margin: 50px 10px 0;
-        width: 285px;
-        &:first-child {
-          margin-left: 0;
-        }
-        &:nth-child(4n) {
-          margin-right: 0;
-        }
-        &:nth-child(5n) {
-          margin-left: 0;
-        }
+
       }
     }
 

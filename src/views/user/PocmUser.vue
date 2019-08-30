@@ -10,11 +10,11 @@
         <div class="right fl">
           <h4>
             <span>总收益</span>
-            <span>{{data.totalDeposit}}<font class="fCN"> NULS</font></span>
+            <span>{{data.totalDeposit/100000000}}<font class="fCN"> NULS</font></span>
           </h4>
           <h4>
             <span>获得抵押</span>
-            <span>{{data.projectConsensusRewards}}<font class="fCN"> NULS</font></span>
+            <span>{{data.projectConsensusRewards/100000000}}<font class="fCN"> NULS</font></span>
           </h4>
         </div>
       </div>

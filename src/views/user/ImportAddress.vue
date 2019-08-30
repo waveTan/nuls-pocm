@@ -132,8 +132,12 @@
 
 <style lang="less">
   .import-address {
-    .title{
-      margin-top: 10px;
+    .bg-white{
+      height: 130px;
+      .title{
+        margin: 20px auto 10px;
+        font-size: 30px;
+      }
     }
     .import-form {
       margin: 60px auto 0;

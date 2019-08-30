@@ -69,14 +69,28 @@
 
 }
 
-.btn-next{
-  .el-button{
+.btn-next {
+  .el-button {
     width: 320px;
   }
 }
 
-.el-message{
-  .el-message__content{
+.el-message {
+  .el-message__content {
     line-height: 20px;
+  }
+}
+
+.el-button--default {
+  &:hover {
+    background-color: transparent !important;
+  }
+}
+
+.el-button--success {
+  background: linear-gradient(to right, #4ef16a, #0ede94) !important;
+  border-color: transparent !important;
+  &:hover {
+    background: linear-gradient(to right, #0ede94, #4ef16a) !important;
   }
 }

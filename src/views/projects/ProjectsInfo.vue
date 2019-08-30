@@ -26,23 +26,27 @@
           <p class="info">{{projectsInfo.mainFunctionPoints}}</p>
         </div>
         <div class="div_info">
-          <h3 class="title">挖矿信息</h3>
+          <h3 class="title">POCM信息</h3>
           <ul class="tonken_info">
             <li><span class="fl">发行总量</span><font class="fl">{{projectsInfo.tokenTotalSupply}}
               {{projectsInfo.tokenSymbol}}</font></li>
             <li><span class="fl">初始流通量</span><font class="fl">{{projectsInfo.tokenInitialCirculatingPercent}}%
               {{projectsInfo.tokenSymbol}} 总量</font></li>
-            <li><span class="fl">可挖矿数量</span><font class="fl">{{projectsInfo.tokenMiningPercent}}%
+            <li><span class="fl">POCM数量</span><font class="fl">{{projectsInfo.tokenMiningPercent}}%
               {{projectsInfo.tokenSymbol}} 总量</font></li>
             <li><span class="fl">最低抵押NULS数量</span><font class="fl">{{projectsInfo.minimumDeposit}} NULS</font></li>
-            <li><span class="fl">已抵押NULS数量</span><font class="fl">{{projectsInfo.tokenTotalSupply}} NULS</font></li>
+            <li><span class="fl">已抵押NULS数量</span><font class="fl">{{projectsInfo.totalDeposit}} NULS</font></li>
             <li><span class="fl">已抵押NULS地址数</span><font class="fl">{{projectsInfo.depositCount}} 个</font></li>
             <li><span class="fl">奖励发放周期</span><font class="fl">{{projectsInfo.awardingCycle}} 个区块</font></li>
             <li><span class="fl">单月可获得Token数/10K NULS</span><font class="fl">{{projectsInfo.tokenPer10000NULSPerMonth}}
               {{projectsInfo.tokenSymbol}}</font>
             </li>
-            <li><span class="fl">奖励减半周期</span><font class="fl">{{projectsInfo.rewardHalvingCycle}}</font></li>
-            <li><span class="fl">预计完成挖矿时间</span><font class="fl">{{projectsInfo.completeMiningTime}}</font></li>
+            <li>
+              <span class="fl">奖励减半周期</span>
+              <font class="fl">{{projectsInfo.rewardHalvingCycle ? '减半' : '不减半' }}</font>
+            </li>
+            <li><span class="fl">预计完成POCM时间</span><font class="fl">{{projectsInfo.completeMiningTime}}</font></li>
+            <li><span class="fl">NULS抵押锁定高度</span><font class="fl">{{projectsInfo.depositLockedHeight}}</font></li>
           </ul>
         </div>
         <div class="div_info cb">
@@ -57,7 +61,7 @@
           <h3>预计挖矿结束时间: {{projectsInfo.completeMiningTime}}</h3>
           <el-form :model="entrustForm" status-icon :rules="entrustRules" ref="entrustForm" class="entrust_form"
                    v-show="accountInfo.address">
-            <div class="tr font12 balance">余额: {{accountInfo.balance/100000000}} <span class="fCN">NULS</span></div>
+            <div class="tr font12 balance">可用余额: {{accountInfo.balance/100000000}} <span class="fCN">NULS</span></div>
             <el-form-item label="" prop="number">
               <el-input v-model="entrustForm.number" placeholder="请输入委托NULS数量"></el-input>
             </el-form-item>
@@ -158,7 +162,7 @@
           .then((response) => {
             console.log(response.data);
             if (response.data.success) {
-              response.data.data.minimumDeposit = divisionDecimals(response.data.data.minimumDeposit);
+              response.data.data.totalDeposit = divisionDecimals(response.data.data.totalDeposit);
               response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
               this.chartData.rows = [...response.data.data.tokenAllocationList]

@@ -110,6 +110,7 @@
         accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
         balanceInfo: {},//账户余额信息
         authorizationCode: this.$route.query.authorizationCode,//项目ID
+        pocmName: '',//创建pocm合约名称 symbol_pocm
         pocmForm: {
           tokenAddress: '',
           awardingCycle: '',
@@ -148,13 +149,16 @@
           .then((response) => {
             console.log(response);
             if (response.hasOwnProperty("result") && response.result.nrc20) {
+              this.pocmName = response.result.symbol + '_pocm';
               return true
             } else {
+              this.pocmName = '';
               //this.$message({message: "验证合约地址错误", type: 'error', duration: 1000});
               return false;
             }
           })
           .catch((error) => {
+            this.pocmName = '';
             console.log(error);
             //this.$message({message: "验证合约地址异常: "+JSON.stringify(error), type: 'error', duration: 1000});
             return false;
@@ -273,7 +277,7 @@
             console.log(response);
             if (response.hasOwnProperty("result")) {
               this.gas = response.result.gasLimit;
-              this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, this.$route.query.name);
+              this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, this.pocmName);
             } else {
               this.$message({message: "预估创建合约交易的gas错误", type: 'error', duration: 1000});
             }

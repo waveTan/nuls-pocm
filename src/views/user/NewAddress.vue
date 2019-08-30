@@ -123,8 +123,10 @@
 
   .new-address {
     .bg-white {
+      height: 100px;
       .title{
-        margin: 20px auto 0;
+        margin: 20px auto 10px;
+        font-size: 30px;
       }
     }
     .tab {

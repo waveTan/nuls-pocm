@@ -121,6 +121,9 @@
     .investor {
       height: 600px;
       width: 100%;
+      .title{
+        margin-top: 140px;
+      }
       .img_bg {
         margin: 100px 0 0 0;
       }
@@ -137,10 +140,10 @@
       height: 790px;
       margin: 0 0 60px 0;
       .hot_title {
-        width: 105px;
+        width: 200px;
         margin: 0 auto;
         h2 {
-          margin: 50px auto 5px;
+          margin: 120px auto 20px;
           text-align: center;
           line-height: 40px;
         }
@@ -151,12 +154,6 @@
       }
       .hot_list {
         margin: 100px auto 0;
-        .p_list {
-          margin: 0 30px;
-          img {
-            width: 220px;
-          }
-        }
       }
     }
   }
