@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home'
 import NewAddress from './views/user/NewAddress'
-import ImportAddress from './views/user/ImportAddress'
 import BackupsAddress from './views/user/BackupsAddress'
 import PocmUser from './views/user/PocmUser'
 import User from './views/user/User'
@@ -25,11 +24,6 @@ export default new Router({
       path: '/User/NewAddress',
       name: 'newAddress',
       component: NewAddress
-    },
-    {
-      path: '/User/ImportAddress',
-      name: 'importAddress',
-      component: ImportAddress
     },
     {
       path: '/User/BackupsAddress',
