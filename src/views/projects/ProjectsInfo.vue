@@ -23,7 +23,7 @@
         </div>
         <div class="div_info">
           <h3 class="title">主要功能</h3>
-          <p class="info">{{projectsInfo.mainFunctionPoints}}</p>
+          <pre class="info">{{projectsInfo.mainFunctionPoints}}</pre>
         </div>
         <div class="div_info">
           <h3 class="title">POCM信息</h3>
@@ -38,7 +38,7 @@
             <li><span class="fl">已抵押NULS数量</span><font class="fl">{{projectsInfo.totalDeposit}} NULS</font></li>
             <li><span class="fl">已抵押NULS地址数</span><font class="fl">{{projectsInfo.depositCount}} 个</font></li>
             <li><span class="fl">奖励发放周期</span><font class="fl">{{projectsInfo.awardingCycle}} 个区块</font></li>
-            <li><span class="fl">单月可获得Token数/10K NULS</span><font class="fl">{{projectsInfo.tokenPer10000NULSPerMonth}}
+            <li><span class="fl">单月可获得Token数/10K NULS</span><font class="fl">{{projectsInfo.tokenPer100NULSPerDay}}
               {{projectsInfo.tokenSymbol}}</font>
             </li>
             <li>
@@ -142,7 +142,6 @@
       };
     },
     created() {
-      console.log(this.releaseId);
       this.selectDataByStatus(this.releaseId);
     },
     components: {
@@ -160,8 +159,9 @@
         const url = POCM_API_URL + '/pocm/release/' + releaseId;
         await axios.get(url)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
+              response.data.data.mainFunctionPoints = response.data.data.mainFunctionPoints.replace(/↵/g, "\n");
               response.data.data.totalDeposit = divisionDecimals(response.data.data.totalDeposit);
               response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
@@ -339,6 +339,12 @@
       .left {
         width: 700px;
         margin: 0 0 100px 0;
+        .div_info {
+          .info {
+            padding: 10px 0 0 0;
+            line-height: 20px;
+          }
+        }
         .tonken_info {
           margin: 20px 0 0 0;
           li {

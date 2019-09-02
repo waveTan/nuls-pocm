@@ -149,7 +149,7 @@
           .then((response) => {
             console.log(response);
             if (response.hasOwnProperty("result") && response.result.nrc20) {
-              this.pocmName = response.result.symbol + '_pocm';
+              this.pocmName = response.result.symbol.toLowerCase() + '_pocm';
               return true
             } else {
               this.pocmName = '';

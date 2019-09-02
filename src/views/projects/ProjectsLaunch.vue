@@ -107,7 +107,7 @@
         }
       };
       let checkTokenInitialCirculatingPercent = (rule, value, callback) => {
-        let regular =  /^(([1-9][0-9]|[1-9])(\.\d{1,2})?|0\.\d{1,2}|100)$/;
+        let regular = /^(([1-9][0-9]|[1-9])(\.\d{1,2})?|0\.\d{1,2}|100)$/;
         if (!value) {
           return callback(new Error('请输入初始流通比例'));
         } else if (!regular.exec(value)) {
@@ -117,7 +117,7 @@
         }
       };
       let checkTokenMiningPercent = (rule, value, callback) => {
-        let regular =  /^(([1-9][0-9]|[1-9])(\.\d{1,2})?|0\.\d{1,2}|100)$/;
+        let regular = /^(([1-9][0-9]|[1-9])(\.\d{1,2})?|0\.\d{1,2}|100)$/;
         if (!value) {
           return callback(new Error('请输入POCM发行比例'));
         } else if (!regular.exec(value)) {
@@ -206,7 +206,7 @@
           mainFunctionPoints: '',
           tokenAllocationList: [
             {allocation: '', percent: '', key: Date.now()},
-            ]
+          ]
         },
         launchRules: {
           name: [{validator: checkName, trigger: 'blur'}],
@@ -226,6 +226,9 @@
     created() {
     },
     mounted() {
+    },
+    destroyed() {
+      this.$refs['launchForm'].resetFields();
     },
     methods: {
 
@@ -279,7 +282,6 @@
             } else {
               this.$message({message: "对不起，提交信息错误，请刷新重试！", type: 'success', duration: 3000});
             }
-            this.$refs['launchForm'].resetFields();
           })
           .catch((error) => {
             console.log(error);
@@ -287,7 +289,6 @@
             this.$refs['launchForm'].resetFields();
           })
       },
-
 
     }
   }
