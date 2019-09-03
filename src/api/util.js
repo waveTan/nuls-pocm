@@ -1,7 +1,7 @@
 import {BigNumber} from 'bignumber.js'
 import nuls from 'nuls-sdk-js'
 import utils from 'nuls-sdk-js/lib/utils/utils'
-import {API_CHAIN_ID, API_PREFIX} from '@/config'
+import {API_CHAIN_ID, API_PREFIX, EXPLORER_URL} from '@/config'
 import {post} from './https'
 
 /**
@@ -207,10 +207,7 @@ export async function getContractMethodArgsTypes(contractAddress, methodName) {
 export function connect(name, parameter, type) {
   if (type === 0) {
     let newQuery = {};
-    let newPush = {name: name,query:{}};
-    console.log(name);
-    console.log(parameter);
-    console.log(!parameter);
+    let newPush = {name: name, query: {}};
     if (parameter) {
       if (name === 'projectsInfo') {
         newQuery = {releaseId: parameter}
@@ -219,7 +216,11 @@ export function connect(name, parameter, type) {
     }
     return {success: true, data: newPush};
   } else {
-    window.open(name,'_blank');
+    let newUrl = '';
+    if (name === 'consensusInfo') {
+      newUrl = EXPLORER_URL + 'consensus/info?hash=' + parameter + '&tabName=first';
+    }
+    window.open(newUrl, '_blank');
     return {success: false};
   }
 }

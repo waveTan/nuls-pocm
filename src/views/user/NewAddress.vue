@@ -205,9 +205,9 @@
         let isPassword = passwordVerification(this.keystoreInfo, password);
         if (isPassword.success) {
           let addressInfo = await getAddressInfoByAddress(this.keystoreInfo.address);
-          let newAdressInfo = {...this.keystoreInfo, ...addressInfo.data};
           if (addressInfo.success) {
-            localStorage.setItem('accountInfo', JSON.stringify(newAdressInfo));
+            let newAddressInfo = {...this.keystoreInfo, ...addressInfo.data};
+            localStorage.setItem('accountInfo', JSON.stringify(newAddressInfo));
             this.toUrl('backupsAddress');
           } else {
             this.$message({message: "导入地址错误: " + addressInfo.data.error.message, type: 'error', duration: 2000});
@@ -226,8 +226,15 @@
       keyImport(formName) {
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
-            const newAddressInfo = nuls.importByKey(API_CHAIN_ID, this.importForm.keys, this.importForm.pass, API_PREFIX);
-            localStorage.setItem('accountInfo', JSON.stringify(newAddressInfo));
+            const keyAddressInfo = nuls.importByKey(API_CHAIN_ID, this.importForm.keys, this.importForm.pass, API_PREFIX);
+            let addressInfo = await getAddressInfoByAddress(keyAddressInfo.address);
+            if (addressInfo.success) {
+              let newAddressInfo = {...keyAddressInfo, ...addressInfo.data};
+              localStorage.setItem('accountInfo', JSON.stringify(newAddressInfo));
+              this.toUrl('backupsAddress');
+            } else {
+              this.$message({message: "导入地址错误: " + addressInfo.data.error.message, type: 'error', duration: 2000});
+            }
             this.toUrl('backupsAddress');
           } else {
             return false;
@@ -246,8 +253,8 @@
           if (valid) {
             this.newAddressInfo = nuls.importByKey(API_CHAIN_ID, this.importForm.keys, this.importForm.pass);
             let addressInfo = await getAddressInfoByAddress(this.newAddressInfo.address);
-            let newAdressInfo = {...this.newAddressInfo, ...addressInfo.data};
             if (addressInfo.success) {
+              let newAdressInfo = {...this.newAddressInfo, ...addressInfo.data};
               localStorage.setItem('accountInfo', JSON.stringify(newAdressInfo));
               this.toUrl('backupsAddress');
             } else {

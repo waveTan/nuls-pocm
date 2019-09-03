@@ -33,7 +33,7 @@ export function countCtxFee(tx, signatrueCount) {
  * @param is10NULS 是否收取10个 nuls 手续费 true false
  * @returns {*}
  **/
-export async function inputsOrOutputs(transferInfo, balanceInfo, type,is10NULS) {
+export async function inputsOrOutputs(transferInfo, balanceInfo, type, is10NULS) {
   let newAmount = Number(Plus(transferInfo.amount, transferInfo.fee));
   let newLocked = 0;
   let newNonce = balanceInfo.nonce;
@@ -89,7 +89,7 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type,is10NULS) 
   let outputs = [];
   if (type === 15) {
     // 部署nrc-20 nrc-721合约收取10nuls 手续费
-    if(is10NULS){
+    if (is10NULS) {
       inputs[0].amount = 10 * 100000000;
       outputs = [{
         address: nuls.getAddressByPub(API_CHAIN_ID, 1, API_BURNING_ADDRESS_PUB, API_PREFIX),
@@ -153,6 +153,11 @@ export async function getBalanceOrNonceByAddress(chainId, assetId, address) {
     .then((response) => {
       //console.log(response);
       if (response.hasOwnProperty("result")) {
+        let accountInfo = JSON.parse(localStorage.getItem('accountInfo'));
+        if (accountInfo.balance !== response.result.balance) {
+          accountInfo.balance = response.result.balance;
+          localStorage.setItem('accountInfo', JSON.stringify(accountInfo))
+        }
         return {success: true, data: {balance: response.result.balance, nonce: response.result.nonce}}
       } else {
         return {success: false, data: response}

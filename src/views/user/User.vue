@@ -15,6 +15,9 @@
           </div>
           <el-table :data="projectList" :stripe="true" class="tables">
             <el-table-column prop="name" label="项目名称" width="180" align="center">
+              <template slot-scope="scope">
+                <span class="click" @click="toUrl('projectsInfo',scope.row.releaseId)">{{scope.row.name}}</span>
+              </template>
             </el-table-column>
             <el-table-column prop="createTime" label="时间" width="180" align="center">
             </el-table-column>
@@ -169,20 +172,14 @@
        */
       async addressInfoByAddress(address) {
         let newData = {aesPri: this.accountInfo.aesPri, pub: this.accountInfo.pub};
-        await getAddressInfoByAddress(address)
-          .then((response) => {
-            //console.log(response);
-            if (response.success) {
-              this.accountInfo = {};
-              response.data.balance = divisionDecimals(response.data.balance);
-              this.accountInfo = {...newData, ...response.data};
-            } else {
-              this.accountInfo.balance = 0
-            }
-          }).catch((error) => {
-            this.accountInfo.balance = 0;
-            console.log(error);
-          })
+        let newAddressInfo = await getAddressInfoByAddress(address);
+        if (newAddressInfo.success) {
+          this.accountInfo = {};
+          newAddressInfo.data.balance = divisionDecimals(newAddressInfo.data.balance);
+          this.accountInfo = {...newData, ...newAddressInfo.data};
+        } else {
+          this.accountInfo.balance = 0
+        }
       },
 
       /**
@@ -268,8 +265,8 @@
        * @author: Wave
        */
       reward(rowInfo) {
-        console.log(rowInfo);
-        console.log("领取奖励 方法名:receiveAwards 参数：无");
+        /*console.log(rowInfo);
+        console.log("领取奖励 方法名:receiveAwards 参数：无");*/
         this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
         this.validateContractCall(this.accountInfo.address, 0, 10000000, 25, rowInfo.contractAddress, 'receiveAwards', '', [rowInfo.depositNumber]);
       },
@@ -295,8 +292,8 @@
        * @author: Wave
        */
       quit(rowInfo) {
-        console.log(rowInfo);
-        console.log("退出 方法名:quit 参数：number(抵押编号)");
+        /*console.log(rowInfo);
+        console.log("退出 方法名:quit 参数：number(抵押编号)");*/
         this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
         this.validateContractCall(this.accountInfo.address, 0, 10000000, 25, rowInfo.contractAddress, 'quit', '', [rowInfo.depositNumber]);
       },
@@ -398,6 +395,20 @@
           this.$message({message: "获取账户余额异常", type: 'error', duration: 1000});
         });
       },
+
+      /**
+       * @disc: url 连接
+       * @params: name
+       * @params: params
+       * @date: 2019-08-20 18:01
+       * @author: Wave
+       */
+      toUrl(name, params) {
+        this.$router.push({
+          name: name,
+          query: {releaseId: params}
+        });
+      }
 
     },
   }

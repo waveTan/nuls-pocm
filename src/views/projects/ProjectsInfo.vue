@@ -46,7 +46,6 @@
               <font class="fl">{{projectsInfo.rewardHalvingCycle ? '减半' : '不减半' }}</font>
             </li>
             <li><span class="fl">预计完成POCM时间</span><font class="fl">{{projectsInfo.completeMiningTime}}</font></li>
-            <li><span class="fl">NULS抵押锁定高度</span><font class="fl">{{projectsInfo.depositLockedHeight}}</font></li>
           </ul>
         </div>
         <div class="div_info cb">
@@ -143,6 +142,7 @@
     },
     created() {
       this.selectDataByStatus(this.releaseId);
+      console.log(this.accountInfo)
     },
     components: {
       Password,
@@ -183,6 +183,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
+            this.accountInfo = JSON.parse(localStorage.getItem('accountInfo'));
             this.validateContractCall(this.accountInfo.address, timesDecimals(this.entrustForm.number), 10000000, 25, this.projectsInfo.contractAddress, 'depositForOwn', '', []);
           } else {
             return false;

@@ -28,7 +28,9 @@
     </div>
     <div class="pocm_user_bottom  w1200">
       <ul class="list">
-        <li class="shadow fl" v-for="(item,index) in myNodeList" :key="index">
+        <li class="shadow fl clicks"
+            v-for="(item,index) in myNodeList" :key="index"
+            @click="toUrl('consensusInfo',item.txHash,1)">
           <h5>{{item.agentId}}<span class="fr"><i class="el-icon-apple"></i>{{item.status === 0 ? '待共识':'共识中'}}</span>
           </h5>
           <p>总收益: {{item.totalReward}} <span class="fr">保证金: {{item.deposit}}</span></p>
@@ -372,7 +374,6 @@
        */
       toUrl(name, parameter, type) {
         let newPath = connect(name, parameter, type);
-        console.log(newPath);
         if (newPath.success) {
           this.$router.push(newPath.data);
         }

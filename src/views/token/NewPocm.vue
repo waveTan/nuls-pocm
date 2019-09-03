@@ -24,7 +24,6 @@
               <font class="fl">{{projectsInfo.rewardHalvingCycle ? '减半' : '不减半' }}</font>
             </li>
             <li><span class="fl">预计完成POCM时间</span><font class="fl">{{projectsInfo.completeMiningTime}}</font></li>
-            <li><span class="fl">NULS抵押锁定高度</span><font class="fl">{{projectsInfo.depositLockedHeight}}</font></li>
           </ul>
         </div>
         <div class="div_info">
@@ -55,7 +54,7 @@
               <el-input v-model="pocmForm.cycleRewardTokenAmount">
               </el-input>
             </el-form-item>
-            <el-form-item label="锁定区块数" prop="minimumLocked">
+            <el-form-item label="锁定区块数" prop="minimumLocked" v-show="false">
               <el-input v-model="pocmForm.minimumLocked">
               </el-input>
             </el-form-item>
@@ -153,7 +152,7 @@
           tokenAddress: '',
           awardingCycle: '',
           cycleRewardTokenAmount: '',
-          minimumLocked: '',
+          minimumLocked: 10,
           minimumDepositNULS: '',
         },
         pocmRules: {

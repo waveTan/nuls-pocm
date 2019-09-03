@@ -135,7 +135,7 @@
   @import "./../assets/css/style";
 
   .header {
-    border-bottom: 2px solid #4ef16a;
+    border-bottom: 1px solid #bebebe;
     height: 100px;
     line-height: 100px;
     .logo {

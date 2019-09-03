@@ -95,11 +95,16 @@
   export default {
     data() {
       let checkName20 = (rule, value, callback) => {
+        let regular = /^(?!_)(?!.*?_$)[A-Za-z0-9_]+$/;
         if (!this.accountInfo) {
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证名称不能为空!'));
-        } else {
+        }  else if (!regular.exec(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else {
           callback();
         }
       };
@@ -137,11 +142,16 @@
       };
 
       let checkName721 = (rule, value, callback) => {
+        let regular = /^(?!_)(?!.*?_$)[A-Za-z0-9_]+$/;
         if (!this.accountInfo) {
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证名称不能为空!'));
-        } else {
+        }  else if (!regular.exec(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else {
           callback();
         }
       };
