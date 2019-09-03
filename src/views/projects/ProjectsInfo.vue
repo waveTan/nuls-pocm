@@ -38,7 +38,7 @@
             <li><span class="fl">已抵押NULS数量</span><font class="fl">{{projectsInfo.totalDeposit}} NULS</font></li>
             <li><span class="fl">已抵押NULS地址数</span><font class="fl">{{projectsInfo.depositCount}} 个</font></li>
             <li><span class="fl">奖励发放周期</span><font class="fl">{{projectsInfo.awardingCycle}} 个区块</font></li>
-            <li><span class="fl">单月可获得Token数/10K NULS</span><font class="fl">{{projectsInfo.tokenPer100NULSPerDay}}
+            <li><span class="fl">单日可获得Token数/100NULS</span><font class="fl">{{projectsInfo.tokenPer100NULSPerDay}}
               {{projectsInfo.tokenSymbol}}</font>
             </li>
             <li>
@@ -70,7 +70,7 @@
             </el-form-item>
           </el-form>
           <div class="tc" v-show="!accountInfo.address">
-            <el-button class="i_bt" @click="toUrl('importAddress','',0)">导入账户</el-button>
+            <el-button class="i_bt" @click="toUrl('newAddress','',0)">导入账户</el-button>
             <el-button class="n_bt" @click="toUrl('newAddress','',0)">创建账户</el-button>
           </div>
         </div>

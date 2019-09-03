@@ -20,7 +20,7 @@
             <el-input v-model="launchForm.tokenInitialCirculatingPercent" placeholder="请填写初始流通比例">
             </el-input>
           </el-form-item>
-          <el-form-item label="发行比例%" prop="tokenMiningPercent">
+          <el-form-item label="POCM发行比例%" prop="tokenMiningPercent">
             <el-input v-model="launchForm.tokenMiningPercent" placeholder="请填写通过POCM发行比例">
             </el-input>
           </el-form-item>
@@ -28,7 +28,7 @@
             <el-input v-model="launchForm.tokenName" placeholder="请填写Token全名">
             </el-input>
           </el-form-item>
-          <el-form-item label="Token缩写" prop="tokenSymbol">
+          <el-form-item label="Token符号" prop="tokenSymbol">
             <el-input v-model="launchForm.tokenSymbol" placeholder="请填写Token缩写">
             </el-input>
           </el-form-item>
@@ -36,12 +36,8 @@
             <el-input v-model="launchForm.website" placeholder="请填写官网地址">
             </el-input>
           </el-form-item>
-          <el-form-item label="项目介绍" prop="projectCard">
-            <el-input v-model="launchForm.projectCard" placeholder="请用一句话介绍您的项目">
-            </el-input>
-          </el-form-item>
-          <el-form-item label="项目说明" prop="introduction">
-            <el-input type="textarea" maxlength="200" show-word-limit v-model="launchForm.introduction"
+          <el-form-item label="项目简介" prop="projectCard">
+            <el-input type="textarea" maxlength="200" show-word-limit v-model="launchForm.projectCard"
                       placeholder="请填写项目说明">
             </el-input>
           </el-form-item>
@@ -51,7 +47,7 @@
             </el-input>
           </el-form-item>
           <div class="channel_proportion">
-            <p>请填写Token分配信息</p>
+            <p>Token分配</p>
             <el-form-item v-for="(domain, index) in launchForm.tokenAllocationList" label="" :key="index">
               <el-input v-model="domain.allocation" placeholder="分配渠道" class="channel fl">
               </el-input>
@@ -60,6 +56,7 @@
               <i class="el-icon-circle-plus-outline" @click="addDomain"></i>
               <i class="el-icon-remove-outline" v-show="index > 0" @click.prevent="removeDomain(domain)"></i>
             </el-form-item>
+            <span class="el-form-item__error" v-show="tokenNum !==100">Token分配比例错误</span>
           </div>
           <el-form-item class="tc">
             <el-button class="btn" @click="submitForm('launchForm')">提交</el-button>
@@ -139,13 +136,13 @@
         }
       };
       let checkTokenSymbol = (rule, value, callback) => {
-        let regular = /[a-zA-Z]$/;
+        let regular = /^(?!_)(?!.*?_$)[A-Za-z0-9_]+$/;
         if (!value) {
-          return callback(new Error('请输入Token缩写'));
+          return callback(new Error('通证缩写不能为空!'));
         } else if (!regular.exec(value)) {
-          return callback(new Error('请输入正确Token缩写只允许英文'));
-        } else if (2 > stringLength(value) || 16 < stringLength(value)) {
-          return callback(new Error('请输入正确Token缩写长度为2-16'));
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        } else if (1 > stringLength(value) || 20 < stringLength(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
         } else {
           callback();
         }
@@ -161,22 +158,10 @@
         }
       };
       let checkProjectCard = (rule, value, callback) => {
-        let regular = /[a-zA-Z]$/;
         if (!value) {
           return callback(new Error('请输入项目介绍'));
-        } else if (!regular.exec(value)) {
-          return callback(new Error('请输入正确项目介绍只允许英文'));
         } else if (2 > stringLength(value) || 150 < stringLength(value)) {
           return callback(new Error('请输入正确项目介绍长度为2-50'));
-        } else {
-          callback();
-        }
-      };
-      let checkIntroduction = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('请输入项目说明'));
-        } else if (8 > stringLength(value) || 600 < stringLength(value)) {
-          return callback(new Error('请输入正确项目说明长度为8-200'));
         } else {
           callback();
         }
@@ -193,19 +178,20 @@
 
       return {
         launchForm: {
-          name: '',
-          email: '',
-          tokenTotalSupply: '',
-          tokenInitialCirculatingPercent: '',
-          tokenMiningPercent: '',
-          tokenName: '',
-          tokenSymbol: '',
-          website: '',
-          projectCard: '',
-          introduction: '',
-          mainFunctionPoints: '',
+          name: 'wave',
+          email: 'wave@qq.com',
+          tokenTotalSupply: '987654321',
+          tokenInitialCirculatingPercent: '10',
+          tokenMiningPercent: '20',
+          tokenName: 'wave',
+          tokenSymbol: 'wave',
+          website: 'http://wave.com',
+          projectCard: 'wave wave',
+          mainFunctionPoints: 'wave wave wave',
           tokenAllocationList: [
-            {allocation: '', percent: '', key: Date.now()},
+            {allocation: '你的', percent: '20', key: Date.now()},
+            {allocation: '你的', percent: '20', key: Date.now()},
+            {allocation: '你的', percent: '20', key: Date.now()},
           ]
         },
         launchRules: {
@@ -218,16 +204,21 @@
           tokenSymbol: [{validator: checkTokenSymbol, trigger: 'blur'}],
           website: [{validator: checkWebsite, trigger: 'blur'}],
           projectCard: [{validator: checkProjectCard, trigger: 'blur'}],
-          introduction: [{validator: checkIntroduction, trigger: 'blur'}],
           mainFunctionPoints: [{validator: checkMainFunctionPoints, trigger: 'blur'}],
-        }
+        },
+        tokenNum: 0,//token分配比例总和
+        tokenNumSetInterval: null,
       };
     },
     created() {
     },
     mounted() {
+      this.tokenNumSetInterval = setInterval(() => {
+        this.verifyAllocationRatio();
+      }, 200)
     },
     destroyed() {
+      clearInterval(this.tokenNumSetInterval);
       this.$refs['launchForm'].resetFields();
     },
     methods: {
@@ -255,13 +246,28 @@
       },
 
       /**
+       * @disc: 验证Token分配比例是否为100%
+       * @params:
+       * @date: 2019-09-03 9:50
+       * @author: Wave
+       */
+      verifyAllocationRatio() {
+        this.tokenNum = 0;
+        for (let item of this.launchForm.tokenAllocationList) {
+          this.tokenNum = this.tokenNum + Number(item.percent)
+        }
+      },
+
+      /**
        * 表单提交
        * @param formName
        */
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.launch(this.launchForm);
+            if (this.tokenNum === 100) {
+              this.launch(this.launchForm);
+            }
           } else {
             return false;
           }
@@ -276,7 +282,7 @@
         const url = POCM_API_URL + '/pocm/release';
         axios.post(url, data)
           .then((response) => {
-            //console.log(response.data);
+            console.log(response.data);
             if (response.data.success) {
               this.$message({message: "您的信息我们已经收到，我们会稍后联系您！", type: 'success', duration: 3000});
             } else {
@@ -289,7 +295,6 @@
             this.$refs['launchForm'].resetFields();
           })
       },
-
     }
   }
 </script>
@@ -360,6 +365,9 @@
             }
             .el-icon-circle-plus-outline {
               margin: 0 5px;
+            }
+            .el-form-item__error {
+              position: relative;
             }
           }
         }

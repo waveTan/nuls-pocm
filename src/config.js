@@ -7,7 +7,7 @@ export const API_PREFIX = 'tNULS';
 //燃烧地址的公钥
 export const API_BURNING_ADDRESS_PUB = '000000000000000000000000000000000000000000000000000000000000000000';
 //pocm api
-export let POCM_API_URL = IS_DEV ? 'http://192.168.1.39:8080' : 'http://192.168.1.39:8080';
+export let POCM_API_URL = IS_DEV ? 'http://192.168.1.40:8080' : 'http://192.168.1.40:8080';
 //正式、测试网络的api
 export let API_URL = IS_DEV ? 'http://apitn1.nulscan.io/' : 'http://apitn1.nulscan.io/';
 //请求最迟时间

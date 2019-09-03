@@ -3,35 +3,41 @@
     <div class="pocm_user_top">
       <div class="w1200">
         <div class="left fl">
-          <h3>{{data.name}} <span class="clicks" @click="toUrl('projectsInfo',data.releaseId,0)">查看项目详情</span></h3>
-          <p>合约地址</p>
-          <h6>{{data.contractAddress}}</h6>
+          <div class="fl">
+            <img class="clicks" @click="toUrl('projectsInfo',data.releaseId,0)" src="./../../assets/img/list_bg.png"/>
+          </div>
+          <div class="fl">
+            <h3 class="font16">{{data.name}}
+              <span class="clicks" @click="toUrl('projectsInfo',data.releaseId,0)">查看项目详情</span>
+            </h3>
+            <p>合约地址</p>
+            <h6>{{data.contractAddress}}</h6>
+          </div>
         </div>
         <div class="right fl">
           <h4>
             <span>总收益</span>
-            <span>{{data.totalDeposit/100000000}}<font class="fCN"> NULS</font></span>
+            <span>{{data.projectConsensusRewards/100000000}}<font class="fCN"> NULS</font></span>
           </h4>
           <h4>
             <span>获得抵押</span>
-            <span>{{data.projectConsensusRewards/100000000}}<font class="fCN"> NULS</font></span>
+            <span>{{data.totalDeposit/100000000}}<font class="fCN"> NULS</font></span>
           </h4>
         </div>
       </div>
     </div>
     <div class="pocm_user_bottom  w1200">
-      <div class="tr">
-        <el-button class="btn" @click="addNode">增加节点</el-button>
-      </div>
       <ul class="list">
         <li class="shadow fl" v-for="(item,index) in myNodeList" :key="index">
-          <h5>
-            {{item.agentId}}
-            <span class="fr"><i class="el-icon-apple"></i>{{item.status === 0 ? '待共识':'共识中'}}</span>
+          <h5>{{item.agentId}}<span class="fr"><i class="el-icon-apple"></i>{{item.status === 0 ? '待共识':'共识中'}}</span>
           </h5>
           <p>总收益: {{item.totalReward}} <span class="fr">保证金: {{item.deposit}}</span></p>
           <p>佣金比例: {{item.commissionRate}}% <span class="fr">委托量: {{item.totalDeposit}}</span></p>
-          <p><span class="fr">信用值: {{item.creditValue}}</span></p>
+          <p>创建时间: {{item.createTime}}<span class="fr">信用值: {{item.creditValue}}</span></p>
+        </li>
+        <li class="shadow fl tc clicks" @click="addNode">
+          <i class="el-icon-plus font24"></i><br/>
+          <span class="font14">添加节点</span>
         </li>
       </ul>
     </div>
@@ -55,6 +61,7 @@
 
 <script>
   import axios from 'axios'
+  import moment from 'moment'
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
   import {API_CHAIN_ID, POCM_API_URL} from '@/config'
@@ -64,7 +71,8 @@
     Plus,
     validateContractCall,
     connect,
-    passwordVerification
+    passwordVerification,
+    getLocalTime
   } from '@/api/util'
   import {inputsOrOutputs, countFee, validateAndBroadcast, getBalanceOrNonceByAddress} from '@/api/requestData'
 
@@ -73,20 +81,22 @@
       let checkValues = async (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请输入正确的节点ID'));
-        }
-        let isAllNodeList = await this.verificationID(value);
-        if (!isAllNodeList.success) {
-          if (isAllNodeList.code === 100) {
-            callback(new Error('节点ID已经存在'));
-          } else if (isAllNodeList.code === 200) {
-            callback(new Error('请输入正确的节点ID'));
+        } else {
+          let isAllNodeList = await this.verificationID(value);
+          if (!isAllNodeList.success) {
+            if (isAllNodeList.code === 100) {
+              callback(new Error('节点ID已经存在'));
+            } else if (isAllNodeList.code === 200) {
+              callback(new Error('请输入正确的节点ID'));
+            } else {
+              callback();
+            }
           } else {
+            this.addNodeInfo = isAllNodeList.data;
             callback();
           }
-        } else {
-          this.addNodeInfo = isAllNodeList.data;
-          callback();
         }
+
       };
       return {
         accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
@@ -115,6 +125,7 @@
     },
     created() {
       this.getConsensusNodes(1, 500, 0);
+      console.log(this.data)
     },
     mounted() {
       let address = '';
@@ -129,7 +140,7 @@
         } else {
           this.pocomUserLoading = false;
         }
-      }, 500);
+      }, 2000);
 
       this.pocmUserSetInterval = setInterval(() => {
         this.getAuthorization(address);
@@ -188,10 +199,11 @@
       getConsensusNodes(pageIndex, pageSize, type) {
         this.$post('/', 'getConsensusNodes', [pageIndex, pageSize, type])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {
                 itme.deposit = divisionDecimals(itme.deposit);
+                itme.createTime = moment(getLocalTime(itme.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');
                 itme.agentReward = divisionDecimals(itme.agentReward);
                 itme.totalDeposit = divisionDecimals(itme.totalDeposit);
                 itme.totalReward = divisionDecimals(itme.totalReward);
@@ -360,6 +372,7 @@
        */
       toUrl(name, parameter, type) {
         let newPath = connect(name, parameter, type);
+        console.log(newPath);
         if (newPath.success) {
           this.$router.push(newPath.data);
         }
@@ -376,8 +389,12 @@
       height: 180px;
       .left {
         width: 60%;
+        img {
+          width: 80%;
+          margin-top: 20px;
+        }
         h3 {
-          font-size: 28px;
+          font-size: 24px;
           color: #FFFFFF;
           margin: 30px 0 30px 0;
           span {
@@ -434,8 +451,11 @@
           p {
             font-size: 12px;
             span {
-              width: 150px;
+              width: 130px;
             }
+          }
+          .el-icon-plus {
+            margin-top: 55px;
           }
         }
       }

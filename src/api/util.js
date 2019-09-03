@@ -207,8 +207,11 @@ export async function getContractMethodArgsTypes(contractAddress, methodName) {
 export function connect(name, parameter, type) {
   if (type === 0) {
     let newQuery = {};
-    let newPush = {name: name};
-    if (!parameter) {
+    let newPush = {name: name,query:{}};
+    console.log(name);
+    console.log(parameter);
+    console.log(!parameter);
+    if (parameter) {
       if (name === 'projectsInfo') {
         newQuery = {releaseId: parameter}
       }

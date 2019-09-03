@@ -16,7 +16,7 @@
                 <el-input v-model="nrc20Form.name20">
                 </el-input>
               </el-form-item>
-              <el-form-item label="通证缩写" prop="symbol20">
+              <el-form-item label="通证符号" prop="symbol20">
                 <el-input v-model="nrc20Form.symbol20">
                 </el-input>
               </el-form-item>
@@ -52,7 +52,7 @@
                 <el-input v-model="nrc721Form.name721">
                 </el-input>
               </el-form-item>
-              <el-form-item label="通证缩写" prop="symbol721">
+              <el-form-item label="通证符号" prop="symbol721">
                 <el-input v-model="nrc721Form.symbol721">
                 </el-input>
               </el-form-item>
@@ -90,6 +90,7 @@
     validateAndBroadcast,
     getContractConstructor
   } from '@/api/requestData'
+  import {stringLength} from '@/api/util'
 
   export default {
     data() {
@@ -103,11 +104,16 @@
         }
       };
       let checkSymbol20 = (rule, value, callback) => {
+        let regular = /^(?!_)(?!.*?_$)[A-Za-z0-9_]+$/;
         if (!this.accountInfo) {
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证缩写不能为空!'));
-        } else {
+        }  else if (!regular.exec(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else {
           callback();
         }
       };
@@ -140,11 +146,16 @@
         }
       };
       let checkSymbol721 = (rule, value, callback) => {
+        let regular = /^(?!_)(?!.*?_$)[A-Za-z0-9_]+$/;
         if (!this.accountInfo) {
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证缩写不能为空!'));
-        } else {
+        }  else if (!regular.exec(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+          return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
+        }else {
           callback();
         }
       };
