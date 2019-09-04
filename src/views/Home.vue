@@ -35,7 +35,7 @@
         </el-col>
       </div>
     </el-row>
-    <el-row class="hot">
+    <el-row class="hot" v-show="false">
       <div class="hot_title">
         <h2 class="title">热门项目</h2>
         <h6></h6>
@@ -69,6 +69,7 @@
       this.selectDataByStatus();
     },
     methods: {
+
       /**
        * @disc: 获取下拉框信息
        * @params:

@@ -68,6 +68,7 @@
   export default {
     name: "bottom-bar",
     methods: {
+
       /**
        * @disc: url 连接
        * @params: name, parameter, type
@@ -94,6 +95,7 @@
     width: 100%;
     background-color: #FFFFFF;
     border-top: 1px solid #bebebe;
+    z-index: 9999;
     //border-bottom-color: linear-gradient(to right, #4ef16a, #0ede94);
     .w1200 {
       height: 100%;

@@ -5,7 +5,7 @@
         <el-tabs v-model="activeName" class="token_tab">
           <el-tab-pane label="发行NRC-20通证" name="nrc20">
             <div class="div_tip">
-              NRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXX
+              NRC-20是NULS平台上的一种通证标准，用户可直接基于该标准在NULS平台上发行自己的通证并用NULS钱包进行管理
             </div>
             <el-form :model="nrc20Form" status-icon :rules="nrc20Rules" ref="nrc20Form" class="new_form w630">
               <el-form-item label="合约名称" prop="contractName20" v-show="false">
@@ -30,7 +30,7 @@
               </el-form-item>
               <div class="font12">
                 通证发行手续费和代码认证费用：10 <span class="fCN">NULS</span>&nbsp;
-                <el-tooltip content="这里是提示信息" placement="top">
+                <el-tooltip content="用户也可自行在钱包中部署合约然后进入浏览器认证，只需支付交易手续费" placement="bottom">
                   <i class="el-icon-warning-outline font14"></i>
                 </el-tooltip>
               </div>
@@ -41,7 +41,7 @@
           </el-tab-pane>
           <el-tab-pane label="发行NRC-721通证" name="nrc721">
             <div class="div_tip">
-              NRC-721 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXXNRC-20 是NULS上的一种通证标准，可用于XXXXXXX
+              NRC-721是NULS平台上的一种通证标准，每一个通证都是独一无二，用户可利用此特性让通证具备不同的属性
             </div>
             <el-form :model="nrc721Form" status-icon :rules="nrc721Rules" ref="nrc721Form" class="new_form w630">
               <el-form-item label="合约名称" prop="contractName20" v-show="false">
@@ -58,7 +58,7 @@
               </el-form-item>
               <div class="font12">
                 通证发行手续费和代码认证费用：10 <span class="fCN">NULS</span>&nbsp;
-                <el-tooltip content="这里是提示信息" placement="top">
+                <el-tooltip content="用户也可自行在钱包中部署合约然后进入浏览器认证，只需支付交易手续费" placement="bottom">
                   <i class="el-icon-warning-outline font14"></i>
                 </el-tooltip>
               </div>
@@ -266,11 +266,11 @@
           let pub = this.accountInfo.pub;
           let remark = '';
           let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, true);
-          console.log(inOrOutputs);
+          //console.log(inOrOutputs);
           if (!inOrOutputs.success) {
             this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
           }
-          console.log(this.contractCreateTxData);
+          //console.log(this.contractCreateTxData);
           let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 15, this.contractCreateTxData);
           let txhex = '';
           //获取手续费
@@ -284,10 +284,10 @@
           } else {
             txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
           }
-          console.log(transferInfo);
+          //console.log(transferInfo);
           //console.log(txhex);
           await validateAndBroadcast(txhex).then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 1000});
               this.validateCode(this.contractCreateTxData.contractAddress, this.activeName === 'nrc20' ? 1 : 2);
@@ -315,7 +315,7 @@
       async validateContractCreate(createAddress, gasLimit, price, contractCode, args, formData) {
         return await this.$post('/', 'validateContractCreate', [createAddress, gasLimit, price, contractCode, args])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.result.success) {
               this.imputedContractCreateGas(createAddress, contractCode, args, formData);
             } else {
@@ -337,7 +337,7 @@
       async imputedContractCreateGas(createAddress, contractCode, args, formData) {
         return await this.$post('/', 'imputedContractCreateGas', [createAddress, contractCode, args])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               this.gas = response.result.gasLimit;
               this.makeCreateData(response.result.gasLimit, createAddress, contractCode, args, formData.contractName);
@@ -379,7 +379,7 @@
           this.$message({message: '组装创建合约交易的txData错误', type: 'error', duration: 1000});
         } else {
           this.contractCreateTxData = contractCreate;
-          console.log(this.contractCreateTxData);
+          //console.log(this.contractCreateTxData);
         }
       },
 
@@ -430,7 +430,7 @@
         const data = {contratAddress: contratAddress, type: type};
         axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (!response.data.success) {
               console.log("认证代码失败");
             }

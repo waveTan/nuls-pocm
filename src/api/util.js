@@ -1,6 +1,7 @@
 import {BigNumber} from 'bignumber.js'
 import nuls from 'nuls-sdk-js'
 import utils from 'nuls-sdk-js/lib/utils/utils'
+import copy from 'copy-to-clipboard'
 import {API_CHAIN_ID, API_PREFIX, EXPLORER_URL} from '@/config'
 import {post} from './https'
 
@@ -87,11 +88,10 @@ export function timesDecimals(nu, decimals = 8) {
  * @author: Wave
  */
 export function passwordVerification(accountInfo, password) {
-  let aesPri = accountInfo.aesPri ? accountInfo.aesPri : accountInfo.encryptedPrivateKey;
-  const pri = nuls.decrypteOfAES(aesPri, password);
+  const pri = nuls.decrypteOfAES(accountInfo.aesPri, password);
   const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password, API_PREFIX);
-  if (newAddressInfo.address === accountInfo.address) {
-    return {success: true, pri: pri, pub: accountInfo.pub};
+  if (newAddressInfo.address === accountInfo.address || nuls.addressEquals(accountInfo.address, newAddressInfo.address)) {
+    return {success: true, pri: pri, pub: accountInfo.pub, aesPri: accountInfo.aesPri, address: newAddressInfo.address};
   } else {
     return {success: false};
   }
@@ -116,6 +116,12 @@ export function getLocalTime(time) {
   let localTime = utcTime + 3600000 * Math.abs(localUtc);
   return new Date(localTime);
 }
+
+/**
+ * 复制 copy
+ * @param value
+ */
+export const copys = (value) => copy(value);
 
 /**
  * @disc: 获取utf-8中英文混合长度

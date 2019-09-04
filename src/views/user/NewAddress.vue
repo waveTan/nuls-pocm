@@ -202,8 +202,11 @@
        * @author: Wave
        */
       async keystoreImportPassSubmit(password) {
+        this.keystoreInfo.aesPri = this.keystoreInfo.encryptedPrivateKey;
+        this.keystoreInfo.pub = this.keystoreInfo.pubKey;
         let isPassword = passwordVerification(this.keystoreInfo, password);
         if (isPassword.success) {
+          this.keystoreInfo.address = isPassword.address;
           let addressInfo = await getAddressInfoByAddress(this.keystoreInfo.address);
           if (addressInfo.success) {
             let newAddressInfo = {...this.keystoreInfo, ...addressInfo.data};

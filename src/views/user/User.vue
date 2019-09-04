@@ -215,7 +215,7 @@
         const data = {releaseId: Id, depositAddress: address};
         axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
               if (response.data.data) {
                 for (let item of response.data.data) {
@@ -243,7 +243,7 @@
       async getMyTokenListByAddress(address) {
         await this.$post('/', 'getAccountContractList', [this.pageIndex, this.pageSize, address, -1, false])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');

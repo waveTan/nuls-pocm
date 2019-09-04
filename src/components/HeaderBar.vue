@@ -8,8 +8,12 @@
         <el-menu :default-active="activeIndex" class="fl" mode="horizontal" @select="handleSelect">
           <el-menu-item index="projects">选择项目</el-menu-item>
           <el-menu-item index="token">发行通证</el-menu-item>
-          <div class="user fr tc" v-if="accountAddress">
-            <div class="user_info">
+          <div class="user fr tc">
+            <div class="height">
+              <i class="el-icon-s-grid fCN"></i>
+              <span> {{height}} </span>
+            </div>
+            <div class="user_info" v-if="accountAddress">
               <el-submenu index="user">
                 <template slot="title"><i class="el-icon-s-custom click "></i>&nbsp;
                 </template>
@@ -35,18 +39,25 @@
       return {
         activeIndex: '1',//导航选中
         accountInfo: {},//账户信息
-        accountAddress: '',
+        accountAddress: '',//账户地址
+        height: 0,//最新高度
       };
     },
     created() {
+      this.getBestBlockHeader();
+    },
+    mounted() {
       setInterval(() => {
         if (localStorage.hasOwnProperty('accountInfo')) {
           this.accountInfo = JSON.parse(localStorage.getItem('accountInfo'));
           this.accountAddress = this.accountInfo.address;
         }
       }, 500);
-    },
 
+      setInterval(() => {
+        this.getBestBlockHeader()
+      }, 10000)
+    },
     methods: {
 
       /**
@@ -87,7 +98,7 @@
         const data = {address: address};
         await axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
               if (response.data.data.length === 0) {
                 this.toUrl('user')
@@ -116,6 +127,24 @@
             console.log(error);
             this.$message({message: "对不起，获取项目发布者异常！", type: 'error', duration: 3000});
           })
+      },
+
+      /**
+       * 获取最新高度
+       */
+      getBestBlockHeader() {
+        this.$post('/', 'getBestBlockHeader', [])
+          .then((response) => {
+            //console.log(response)
+            if (response.hasOwnProperty("result")) {
+              this.height = response.result.height;
+            } else {
+              this.height = 0;
+            }
+          }).catch((error) => {
+          this.height = 0;
+          console.log(error);
+        })
       },
 
       /**
@@ -160,7 +189,7 @@
           &:hover {
             color: @Ncolour;
           }
-          &:first-child{
+          &:first-child {
             margin-left: 75px;
           }
         }
@@ -170,7 +199,14 @@
         }
       }
       .user {
+        margin-right: 20px;
+        .height {
+          width: 120px;
+          float: left;
+        }
         .user_info {
+          float: right;
+          width: 50px;
           .el-submenu {
             &:hover {
               background-color: transparent;
@@ -181,7 +217,7 @@
               margin: 40px auto 0;
               padding: 0;
               width: 25px;
-              &:hover{
+              &:hover {
                 background-color: transparent;
               }
               .el-icon-arrow-down {
@@ -193,7 +229,7 @@
       }
       .landing {
         width: 30px;
-        margin: -55px 120px 0 0;
+        margin: -55px 0 0 0;
         text-align: center;
         z-index: 99;
         position: relative;

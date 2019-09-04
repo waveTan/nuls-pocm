@@ -27,10 +27,19 @@
     data() {
       return {
         projectsList: [],//项目列表
+        listSetInterval: null,
       };
     },
     created() {
       this.selectDataByStatus();
+    },
+    mounted() {
+      this.listSetInterval = setInterval(() => {
+        this.selectDataByStatus();
+      }, 10000)
+    },
+    destroyed() {
+      clearInterval(this.listSetInterval);
     },
     methods: {
 
@@ -45,7 +54,7 @@
         const data = {status: 1};
         axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
               for (let itme of response.data.data) {
                 itme.totalDeposit = divisionDecimals(itme.totalDeposit);

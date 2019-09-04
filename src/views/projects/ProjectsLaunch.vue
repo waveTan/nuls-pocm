@@ -282,7 +282,7 @@
         const url = POCM_API_URL + '/pocm/release';
         axios.post(url, data)
           .then((response) => {
-            console.log(response.data);
+            //console.log(response.data);
             if (response.data.success) {
               this.$message({message: "您的信息我们已经收到，我们会稍后联系您！", type: 'success', duration: 3000});
             } else {

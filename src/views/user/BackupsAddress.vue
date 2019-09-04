@@ -46,6 +46,7 @@
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
   import {API_CHAIN_ID, API_PREFIX} from '@/config'
+  import {copys} from '@/api/util'
 
   export default {
     components: {Password},
@@ -92,7 +93,7 @@
        * @param sting
        **/
       copy(sting) {
-        console.log(sting);
+        copys(sting);
         this.$message({message: "复制完成", type: 'success', duration: 1000});
       },
     }
