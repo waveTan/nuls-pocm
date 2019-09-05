@@ -225,6 +225,8 @@ export function connect(name, parameter, type) {
     let newUrl = '';
     if (name === 'consensusInfo') {
       newUrl = EXPLORER_URL + 'consensus/info?hash=' + parameter + '&tabName=first';
+    } else if (name === 'contractsInfo') {
+      newUrl = EXPLORER_URL + 'contracts/info?contractAddress=' + parameter + '&tabName=first';
     }
     window.open(newUrl, '_blank');
     return {success: false};

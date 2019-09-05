@@ -86,7 +86,7 @@
 
 <style lang="less">
   .projects_list {
-    min-height: 900px;
+    min-height: 700px;
     margin: 0 auto 60px;
     .projects_title {
       .info {

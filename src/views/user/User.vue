@@ -248,7 +248,7 @@
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime * 1000)).format('YYYY-MM-DD HH:mm:ss');
               }
-              this.passportList = [...response.result.list];
+              this.passportList = response.result.list.filter(item => item.tokenType !== 0);
             } else {
               this.$message({message: "获取我的通证列表错误：" + JSON.stringify(response.error), type: 'error', duration: 3000});
             }

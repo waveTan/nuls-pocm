@@ -100,11 +100,11 @@
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证名称不能为空!'));
-        }  else if (!regular.exec(value)) {
+        } else if (!regular.exec(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+        } else if (1 > stringLength(value) || 20 < stringLength(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else {
+        } else {
           callback();
         }
       };
@@ -114,11 +114,11 @@
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证缩写不能为空!'));
-        }  else if (!regular.exec(value)) {
+        } else if (!regular.exec(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+        } else if (1 > stringLength(value) || 20 < stringLength(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else {
+        } else {
           callback();
         }
       };
@@ -147,11 +147,11 @@
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证名称不能为空!'));
-        }  else if (!regular.exec(value)) {
+        } else if (!regular.exec(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+        } else if (1 > stringLength(value) || 20 < stringLength(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else {
+        } else {
           callback();
         }
       };
@@ -161,11 +161,11 @@
           return callback(new Error('请先登录！'));
         } else if (!value) {
           return callback(new Error('通证缩写不能为空!'));
-        }  else if (!regular.exec(value)) {
+        } else if (!regular.exec(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else if (1 > stringLength(value) || 20 < stringLength(value)) {
+        } else if (1 > stringLength(value) || 20 < stringLength(value)) {
           return callback(new Error('只允许使用大、小写字母、数字、下划线（下划线不能在两端）1~20字节'));
-        }else {
+        } else {
           callback();
         }
       };
@@ -447,14 +447,13 @@
 <style lang="less">
   .new_token {
     .token_bg {
-      width: 140%;
+      width: 100%;
       height: 220px;
       position: absolute;
-      left: -20%;
       top: 0;
       z-index: -1;
       content: '';
-      border-radius: 0 0 50% 50%;
+      border-radius: 0 0 55% 55%;
       background: linear-gradient(to right, #4ef16a, #0ede94);
       padding-top: 50px;
       .token_inf {

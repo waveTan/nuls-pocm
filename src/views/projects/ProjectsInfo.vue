@@ -30,19 +30,32 @@
           <ul class="tonken_info">
             <li><span class="fl">发行总量</span><font class="fl">{{projectsInfo.tokenTotalSupply}}
               {{projectsInfo.tokenSymbol}}</font></li>
-            <li><span class="fl">初始流通量</span><font class="fl">{{projectsInfo.tokenInitialCirculatingPercent}}%</font></li>
+            <li><span class="fl">初始流通量</span><font class="fl">{{projectsInfo.tokenInitialCirculatingPercent}}%</font>
+            </li>
             <li><span class="fl">POCM数量</span><font class="fl">{{projectsInfo.tokenMiningPercent}}%</font></li>
-            <li><span class="fl">剩余Token数量</span><font class="fl">{{projectsInfo.unAllocationTokenAmount}}</font></li>
-            <li><span class="fl">POCM合约地址</span><font class="fl">{{projectsInfo.contractAddress}}</font></li>
+            <li><span class="fl">合约中剩余Token数量</span><font class="fl">{{projectsInfo.unAllocationTokenAmount}}</font>
+            </li>
+            <li>
+              <span class="fl">POCM合约地址</span>
+              <font class="fl click" @click="toUrl('contractsInfo',projectsInfo.contractAddress,1)">
+                {{projectsInfo.contractAddress}}
+              </font>
+            </li>
+            <li>
+              <span class="fl">Token合约地址</span>
+              <font class="fl click" @click="toUrl('contractsInfo',projectsInfo.tokenContractAddress,1)">
+                {{projectsInfo.tokenContractAddress}}
+              </font>
+            </li>
             <li><span class="fl">最低抵押NULS数量</span><font class="fl">{{projectsInfo.minimumDeposit}} NULS</font></li>
             <li><span class="fl">已抵押NULS数量</span><font class="fl">{{projectsInfo.totalDeposit}} NULS</font></li>
-            <li><span class="fl">已抵押NULS地址数</span><font class="fl">{{projectsInfo.depositCount}} 个</font></li>
-            <li><span class="fl">单周期奖励Token数量</span><font class="fl">{{projectsInfo.tokenPer100NULSPerDay}}
+            <li><span class="fl">参与者</span><font class="fl">{{projectsInfo.depositCount}} 个</font></li>
+            <li><span class="fl">单周期奖励Token数量</span><font class="fl">{{projectsInfo.cycleRewardTokenAmount}}
               {{projectsInfo.tokenSymbol}}</font>
             </li>
             <li>
-              <span class="fl">奖励减半周期</span>
-              <font class="fl">{{projectsInfo.rewardHalvingCycle ? '减半' : '不减半' }}</font>
+              <span class="fl">获取Token奖励的锁定天数</span>
+              <font class="fl">{{projectsInfo.lockedTokenDay}}</font>
             </li>
           </ul>
         </div>
@@ -140,7 +153,6 @@
     },
     created() {
       this.selectDataByStatus(this.releaseId);
-      console.log(this.accountInfo)
     },
     components: {
       Password,
@@ -161,6 +173,7 @@
             if (response.data.success) {
               response.data.data.mainFunctionPoints = response.data.data.mainFunctionPoints.replace(/↵/g, "\n");
               response.data.data.totalDeposit = divisionDecimals(response.data.data.totalDeposit);
+              response.data.data.unAllocationTokenAmount = divisionDecimals(response.data.data.unAllocationTokenAmount,response.data.data.tokenDecimals);
               response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
               this.chartData.rows = [...response.data.data.tokenAllocationList]
@@ -257,6 +270,7 @@
             if (response.success) {
               this.entrustForm.number = '';
               this.$message({message: "委托交易已经发出，区块确定需要一定的时间，你可以在浏览器上查询交易是否已确定", type: 'success', duration: 2000});
+              this.toUrl('user','')
             } else {
               this.$message({message: "广播交易失败", type: 'error', duration: 3000});
             }
@@ -365,6 +379,9 @@
             font {
               color: #333333;
               padding-left: 50px;
+            }
+            .click {
+              color: #608FFF;
             }
           }
         }

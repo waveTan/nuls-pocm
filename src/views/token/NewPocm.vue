@@ -67,7 +67,11 @@
               <el-input v-model="pocmForm.minimumDepositNULS">
               </el-input>
             </el-form-item>
-            <div class="yellow font12">注意: 抵押NULS的10%将会被锁定，无法参与共识</div>
+            <el-form-item label="获取Token奖励的锁定天数" prop="lockedTokenDay">
+              <el-input v-model="pocmForm.lockedTokenDay">
+              </el-input>
+            </el-form-item>
+            <div class="yellow font12 mt_30">注意: 抵押NULS的10%将会被锁定，无法参与共识</div>
             <el-form-item class="tc">
               <el-button class="btn" @click="submitPocmForm('pocmForm')">发 布</el-button>
             </el-form-item>
@@ -152,6 +156,16 @@
           callback();
         }
       };
+      let checkLockedTokenDay = (rule, value, callback) => {
+        let regular = /^([1-9][0-9]{0,5}|100000)$/;
+        if (!value) {
+          return callback(new Error('请填写用户领取收益后的锁定天数'));
+        }else if (!regular.exec(value)) {
+          return callback(new Error('请输入100000以内的正整数'));
+        } else {
+          callback();
+        }
+      };
       return {
         accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
         balanceInfo: {},//账户余额信息
@@ -166,6 +180,7 @@
           cycleRewardTokenAmount: '',
           minimumLocked: 10,
           minimumDepositNULS: '',
+          lockedTokenDay:''
         },
         pocmRules: {
           tokenAddress: [{validator: checkTokenAddress, trigger: 'blur'}],
@@ -173,6 +188,7 @@
           cycleRewardTokenAmount: [{validator: checkCycleRewardTokenAmount, trigger: 'blur'}],
           minimumLocked: [{validator: checkMinimumLocked, trigger: 'blur'}],
           minimumDepositNULS: [{validator: checkMinimumDepositNULS, trigger: 'blur'}],
+          lockedTokenDay: [{validator: checkLockedTokenDay, trigger: 'blur'}],
         },
         gas: 1,
         price: 25,
@@ -252,7 +268,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
-            let newArr = [this.pocmForm.tokenAddress, this.pocmForm.cycleRewardTokenAmount, this.pocmForm.awardingCycle, this.pocmForm.minimumDepositNULS, this.pocmForm.minimumLocked, true, this.authorizationCode, null, null];
+            let newArr = [this.pocmForm.tokenAddress, this.pocmForm.cycleRewardTokenAmount, this.pocmForm.awardingCycle, this.pocmForm.minimumDepositNULS, this.pocmForm.minimumLocked, true,this.pocmForm.lockedTokenDay, this.authorizationCode, null, null];
             this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, POCM, newArr);
             this.$refs.password.showPassword(true);
           } else {
@@ -321,7 +337,7 @@
           //console.log(transferInfo);
           //console.log(txhex);
           await validateAndBroadcast(txhex).then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 1000});
               this.validateCode(this.contractCreateTxData.contractAddress, 99);

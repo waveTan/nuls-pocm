@@ -178,20 +178,18 @@
 
       return {
         launchForm: {
-          name: 'wave',
-          email: 'wave@qq.com',
-          tokenTotalSupply: '987654321',
-          tokenInitialCirculatingPercent: '10',
-          tokenMiningPercent: '20',
-          tokenName: 'wave',
-          tokenSymbol: 'wave',
-          website: 'http://wave.com',
-          projectCard: 'wave wave',
-          mainFunctionPoints: 'wave wave wave',
+          name: '',
+          email: '',
+          tokenTotalSupply: '',
+          tokenInitialCirculatingPercent: '',
+          tokenMiningPercent: '',
+          tokenName: '',
+          tokenSymbol: '',
+          website: '',
+          projectCard: '',
+          mainFunctionPoints: '',
           tokenAllocationList: [
-            {allocation: '你的', percent: '20', key: Date.now()},
-            {allocation: '你的', percent: '20', key: Date.now()},
-            {allocation: '你的', percent: '20', key: Date.now()},
+            {allocation: '', percent: '', key: Date.now()},
           ]
         },
         launchRules: {
@@ -302,14 +300,13 @@
 <style lang="less">
   .projects_launch {
     .projects_bg {
-      width: 140%;
+      width: 100%;
       height: 220px;
       position: absolute;
-      left: -20%;
       top: 0;
       z-index: -1;
       content: '';
-      border-radius: 0 0 50% 50%;
+      border-radius: 0 0 55% 55%;
       background: linear-gradient(to right, #4ef16a, #0ede94);
       padding-top: 50px;
       .projects_form {
