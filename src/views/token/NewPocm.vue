@@ -265,11 +265,11 @@
        * @author: Wave
        */
       submitPocmForm(formName) {
-        this.$refs[formName].validate((valid) => {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
-            this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
+            await this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
             let newArr = [this.pocmForm.tokenAddress, this.pocmForm.cycleRewardTokenAmount, this.pocmForm.awardingCycle, this.pocmForm.minimumDepositNULS, this.pocmForm.minimumLocked, true,this.pocmForm.lockedTokenDay, this.authorizationCode, null, null];
-            this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, POCM, newArr);
+            await this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, POCM, newArr);
             this.$refs.password.showPassword(true);
           } else {
             return false;

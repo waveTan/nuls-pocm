@@ -2,7 +2,7 @@
   <div class="new_token">
     <div class="token_bg">
       <div class="bg-white shadow w1200 token_inf">
-        <el-tabs v-model="activeName" class="token_tab">
+        <el-tabs v-model="activeName" class="token_tab" v-loading="newLoading">
           <el-tab-pane label="发行NRC-20通证" name="nrc20">
             <div class="div_tip">
               NRC-20是NULS平台上的一种通证标准，用户可直接基于该标准在NULS平台上发行自己的通证并用NULS钱包进行管理
@@ -82,7 +82,7 @@
   import sdk from 'nuls-sdk-js/lib/api/sdk'
   import utils from 'nuls-sdk-js/lib/utils/utils'
   import Password from '@/components/PasswordBar'
-  import {POCM_API_URL, API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721} from '@/config'
+  import {POCM_API_URL, API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721, OUT_ADDRESS} from '@/config'
   import {
     getBalanceOrNonceByAddress,
     countFee,
@@ -90,7 +90,7 @@
     validateAndBroadcast,
     getContractConstructor
   } from '@/api/requestData'
-  import {stringLength} from '@/api/util'
+  import {stringLength, timesDecimals} from '@/api/util'
 
   export default {
     data() {
@@ -171,6 +171,7 @@
       };
 
       return {
+        newLoading: false,//加载动画
         accountInfo: JSON.parse(localStorage.getItem('accountInfo')),//账户信息
         balanceInfo: {},//账户余额信息
         activeName: 'nrc20', //tab 默认选中
@@ -216,12 +217,12 @@
        * @param formName
        */
       submitNrc20Form(formName) {
-        this.$refs[formName].validate((valid) => {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
             this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
             let newArr = Object.values(this.nrc20Form);
             newArr.shift();
-            this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC20_HEX, newArr, this.nrc20Form);
+            await this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC20_HEX, newArr, this.nrc20Form);
             this.$refs.password.showPassword(true);
           } else {
             return false;
@@ -234,12 +235,12 @@
        * @param formName
        */
       submitNrc721Form(formName) {
-        this.$refs[formName].validate((valid) => {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
             this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
             let newArr = Object.values(this.nrc721Form);
             newArr.shift();
-            this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC_721, newArr, this.nrc721Form);
+            await this.validateContractCreate(this.accountInfo.address, sdk.CONTRACT_MAX_GASLIMIT, sdk.CONTRACT_MINIMUM_PRICE, NRC_721, newArr, this.nrc721Form);
             this.$refs.password.showPassword(true);
           } else {
             return false;
@@ -255,52 +256,108 @@
         const pri = nuls.decrypteOfAES(this.accountInfo.aesPri, password);
         const newAddressInfo = nuls.importByKey(API_CHAIN_ID, pri, password, API_PREFIX);
         let amount = this.contractCreateTxData.gasLimit * this.contractCreateTxData.price;
+        //console.log(amount);
         if (newAddressInfo.address === this.accountInfo.address) {
+          this.newLoading = true;
           let transferInfo = {
             fromAddress: this.accountInfo.address,
             assetsChainId: API_CHAIN_ID,
             assetsId: 1,
             amount: amount,
-            fee: 100000
+            fee: 100000,
+            remark: '',
           };
           let pub = this.accountInfo.pub;
-          let remark = '';
-          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, true);
-          //console.log(inOrOutputs);
-          if (!inOrOutputs.success) {
-            this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
-          }
-          //console.log(this.contractCreateTxData);
-          let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 15, this.contractCreateTxData);
-          let txhex = '';
-          //获取手续费
-          let newFee = countFee(tAssemble, 1);
-          //手续费大于0.001的时候重新组装交易及签名
-          if (transferInfo.fee !== newFee) {
-            transferInfo.fee = newFee;
-            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15, true);
-            tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 15, this.contractCreateTxData);
-            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
-          } else {
-            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
-          }
-          //console.log(transferInfo);
-          //console.log(txhex);
-          await validateAndBroadcast(txhex).then((response) => {
-            //console.log(response);
-            if (response.success) {
-              this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 1000});
-              this.validateCode(this.contractCreateTxData.contractAddress, this.activeName === 'nrc20' ? 1 : 2);
-              this.contractCreateTxData = {};
+          let transferAssemble = await this.transferTransaction(transferInfo, pri, pub);
+          if (transferAssemble.success) {
+            await this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
+            let contractAssemble = await this.contractTransaction(transferInfo, pri, pub);
+            //console.log(contractAssemble);
+            if (contractAssemble.success) {
+              this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 2000});
+              this.newLoading = false;
             } else {
-              this.$message({message: "合约验证并广播失败", type: 'error', duration: 1000});
+              this.$message({message: "合约交易失败", type: 'error', duration: 3000});
             }
-          }).catch((error) => {
-            console.log(error);
-            this.$message({message: "合约验证并广播异常", type: 'error', duration: 1000});
-          });
+          } else {
+            this.$message({message: "交易失败，请确定账户余额是否足够！", type: 'error', duration: 3000});
+          }
         } else {
           this.$message({message: "对不起，密码错误", type: 'error', duration: 1000});
+        }
+      },
+
+      /**
+       * @disc: 发起10个nuls转账交易
+       * @params: transferInfo,pri,pub
+       * @date: 2019-09-06 16:00
+       * @author: Wave
+       */
+      async transferTransaction(transferInfo, pri, pub) {
+        transferInfo['toAddress'] = OUT_ADDRESS;
+        transferInfo['amount'] = Number(timesDecimals(10));
+        let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+        if (!inOrOutputs.success) {
+          this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
+          return {success: false};
+        }
+        //交易组装
+        let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, transferInfo.remark, 2);
+        let txhex = '';
+        //获取手续费
+        let newFee = countFee(tAssemble, 1);
+        //手续费大于0.001的时候重新组装交易及签名
+        if (transferInfo.fee !== newFee) {
+          transferInfo.fee = newFee;
+          inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+          tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, transferInfo.remark, 2);
+          txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+        } else {
+          txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+        }
+        let transferValidate = await validateAndBroadcast(txhex);
+        if (transferValidate.success) {
+          return {success: true}
+        } else {
+          console.log(transferValidate);
+          return {success: false}
+        }
+      },
+
+      /**
+       * @disc: 发起合约交易
+       * @params: transferInfo,pri,pub
+       * @date: 2019-09-06 16:00
+       * @author: Wave
+       */
+      async contractTransaction(transferInfo, pri, pub) {
+        transferInfo['toAddress'] = '';
+        transferInfo['amount'] = this.contractCreateTxData.gasLimit * this.contractCreateTxData.price;
+        let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+        if (!inOrOutputs.success) {
+          this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
+          return {success: false};
+        }
+        let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, transferInfo.remark, 15, this.contractCreateTxData);
+        let txhex = '';
+        //获取手续费
+        let newFee = countFee(tAssemble, 1);
+        //手续费大于0.001的时候重新组装交易及签名
+        if (transferInfo.fee !== newFee) {
+          transferInfo.fee = newFee;
+          inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 15);
+          tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, transferInfo.remark, 15, this.contractCreateTxData);
+          txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+        } else {
+          txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+        }
+        //console.log(txhex);
+        let contractValidate = await validateAndBroadcast(txhex);
+        if (contractValidate.success) {
+          return {success: true}
+        } else {
+          console.log(contractValidate);
+          return {success: false}
         }
       },
 

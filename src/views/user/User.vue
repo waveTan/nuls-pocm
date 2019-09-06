@@ -30,16 +30,16 @@
             </el-table-column>
             <el-table-column prop="unreceivedMiningAmount" label="未领取收益" width="200" align="center">
               <template slot-scope="scope">
-                {{scope.row.unreceivedMiningAmount}} {{scope.row.tokenSymbol}}
+                {{scope.row.status === 0 ? scope.row.unreceivedMiningAmount : 0}} {{scope.row.tokenSymbol}}
               </template>
             </el-table-column>
             <el-table-column label="操作" min-width="180" align="center">
               <template slot-scope="scope">
-                <span class="click" @click="reward(scope.row)">领取奖励</span>
+                <el-link class="click" @click="reward(scope.row)" :disabled="scope.row.status===1">领取奖励</el-link>
                 <font style="padding: 0 10px">|</font>
-                <span class="click" @click="append(scope.row)">追加</span>
+                <el-link class="click" @click="append(scope.row)">追加</el-link>
                 <font style="padding: 0 10px">|</font>
-                <span class="click" @click="quit(scope.row)">退出</span>
+                <el-link class="click" @click="quit(scope.row)" :disabled="scope.row.status===1">退出</el-link>
               </template>
             </el-table-column>
           </el-table>
@@ -212,7 +212,7 @@
        */
       getProjectList(Id, address) {
         const url = POCM_API_URL + '/pocm/mining/list';
-        const data = {releaseId: Id, depositAddress: address};
+        const data = {releaseId: Id, depositAddress: address, status: -1};
         axios.post(url, data)
           .then((response) => {
             //console.log(response.data);

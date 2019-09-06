@@ -173,7 +173,7 @@
             if (response.data.success) {
               response.data.data.mainFunctionPoints = response.data.data.mainFunctionPoints.replace(/↵/g, "\n");
               response.data.data.totalDeposit = divisionDecimals(response.data.data.totalDeposit);
-              response.data.data.unAllocationTokenAmount = divisionDecimals(response.data.data.unAllocationTokenAmount,response.data.data.tokenDecimals);
+              response.data.data.unAllocationTokenAmount = divisionDecimals(response.data.data.unAllocationTokenAmount, response.data.data.tokenDecimals);
               response.data.data.completeMiningTime = moment(getLocalTime(response.data.data.completeMiningTime)).format('YYYY-MM-DD HH:mm:ss');
               this.projectsInfo = response.data.data;
               this.chartData.rows = [...response.data.data.tokenAllocationList]
@@ -191,9 +191,9 @@
        * @author: Wave
        */
       submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
-            this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
+            await this.getBalanceByAddress(API_CHAIN_ID, 1, this.accountInfo.address);
             this.accountInfo = JSON.parse(localStorage.getItem('accountInfo'));
             this.validateContractCall(this.accountInfo.address, timesDecimals(this.entrustForm.number), 10000000, 25, this.projectsInfo.contractAddress, 'depositForOwn', '', []);
           } else {
@@ -270,7 +270,7 @@
             if (response.success) {
               this.entrustForm.number = '';
               this.$message({message: "委托交易已经发出，区块确定需要一定的时间，你可以在浏览器上查询交易是否已确定", type: 'success', duration: 2000});
-              this.toUrl('user','')
+              this.toUrl('user', '', 0)
             } else {
               this.$message({message: "广播交易失败", type: 'error', duration: 3000});
             }
