@@ -82,7 +82,7 @@
   import sdk from 'nuls-sdk-js/lib/api/sdk'
   import utils from 'nuls-sdk-js/lib/utils/utils'
   import Password from '@/components/PasswordBar'
-  import {POCM_API_URL, API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721, OUT_ADDRESS} from '@/config'
+  import {POCM_API_URL, API_CHAIN_ID, API_PREFIX, NRC20_HEX, NRC_721, OUT_ADDRESS_PUB} from '@/config'
   import {
     getBalanceOrNonceByAddress,
     countFee,
@@ -276,6 +276,7 @@
             if (contractAssemble.success) {
               this.$message({message: "合约已经发送成功，区块确认需要一定时间", type: 'success', duration: 2000});
               this.newLoading = false;
+              this.activeName === 'nrc20' ? this.$refs['nrc20Form'].resetFields() : this.$refs['nrc721Form'].resetFields()
             } else {
               this.$message({message: "合约交易失败", type: 'error', duration: 3000});
             }
@@ -294,7 +295,7 @@
        * @author: Wave
        */
       async transferTransaction(transferInfo, pri, pub) {
-        transferInfo['toAddress'] = OUT_ADDRESS;
+        transferInfo['toAddress'] = nuls.getAddressByPub(API_CHAIN_ID,1,OUT_ADDRESS_PUB ,API_PREFIX);
         transferInfo['amount'] = Number(timesDecimals(10));
         let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
         if (!inOrOutputs.success) {

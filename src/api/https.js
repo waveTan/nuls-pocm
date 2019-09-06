@@ -3,7 +3,7 @@ import {API_CHAIN_ID, API_TIME, API_URL} from '@/config'
 
 axios.defaults.timeout = API_TIME;
 axios.defaults.baseURL = API_URL;
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
 
 /**
  * 封装post请求

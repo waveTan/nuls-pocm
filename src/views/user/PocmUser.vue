@@ -127,7 +127,6 @@
     },
     created() {
       this.getConsensusNodes(1, 500, 0);
-      console.log(this.data);
     },
     mounted() {
       let address = '';
