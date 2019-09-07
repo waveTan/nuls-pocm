@@ -178,18 +178,20 @@
 
       return {
         launchForm: {
-          name: '',
-          email: '',
-          tokenTotalSupply: '',
-          tokenInitialCirculatingPercent: '',
-          tokenMiningPercent: '',
-          tokenName: '',
-          tokenSymbol: '',
-          website: '',
-          projectCard: '',
-          mainFunctionPoints: '',
+          name: 'wave test projects',
+          email: 'wave@qq.com',
+          tokenTotalSupply: '987654321',
+          tokenInitialCirculatingPercent: '10',
+          tokenMiningPercent: '20',
+          tokenName: 'wavwe',
+          tokenSymbol: 'wave',
+          website: 'http://wave.com',
+          projectCard: 'wave test',
+          mainFunctionPoints: 'wave test go',
           tokenAllocationList: [
-            {allocation: '', percent: '', key: Date.now()},
+            {allocation: '你的', percent: '10', key: Date.now()},
+            {allocation: '我的', percent: '20', key: Date.now()},
+            {allocation: '她们的', percent: '70', key: Date.now()},
           ]
         },
         launchRules: {
@@ -278,9 +280,10 @@
        **/
       launch(data) {
         const url = POCM_API_URL + '/pocm/release';
+        console.log(url);
         axios.post(url, data)
           .then((response) => {
-            //console.log(response.data);
+            console.log(response.data);
             if (response.data.success) {
               this.$message({message: "您的信息我们已经收到，我们会稍后联系您！", type: 'success', duration: 3000});
             } else {

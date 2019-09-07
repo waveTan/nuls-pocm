@@ -18,6 +18,7 @@
                 <template slot="title"><i class="el-icon-s-custom click "></i>&nbsp;
                 </template>
                 <el-menu-item index="userInfo">用户中心</el-menu-item>
+                <el-menu-item index="backupsAddress">备份账户</el-menu-item>
                 <el-menu-item index="signOut">退出</el-menu-item>
               </el-submenu>
             </div>
@@ -63,7 +64,6 @@
       /**
        * 导航切换
        * @param key
-       * @param keyPath
        */
       handleSelect(key) {
         if (key === 'projects') {
@@ -72,7 +72,9 @@
           this.toUrl('newToken')
         } else if (key === 'userInfo') {
           this.getAuthorization(this.accountInfo.address);
-        } else if (key === 'signOut') {
+        }else if(key ==='backupsAddress'){
+          this.toUrl('backupsAddress');
+        }else if (key === 'signOut') {
           this.signOut();
         }
       },

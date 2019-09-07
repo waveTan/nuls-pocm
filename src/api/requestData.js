@@ -116,10 +116,9 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
  * @returns {Promise<any>}
  */
 export async function getAddressInfoByAddress(address) {
-  console.log(address);
   return await post('/', 'getAccount', [address])
     .then((response) => {
-      console.log(response);
+      //console.log(response);
       if (response.hasOwnProperty("result")) {
         return {success: true, data: response.result}
       } else {
